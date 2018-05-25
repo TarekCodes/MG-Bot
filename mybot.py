@@ -70,6 +70,17 @@ async def on_message(message):
 
 
 @client.event
+async def on_member_join(member):
+    msg = "Assalamualaikum " + member.mention + "! Welcome to **Muslim Gamers**! Please take a moment to introduce "
+    msg += "yourself! You may only chat here for the time being until you reach lvl 1.\n\n"
+    msg += "**You gain lvls by chatting!**\nAfter reaching lvl 1 you will gain access to the rest of the chats.\n\n"
+    msg += "Feel free to read " + client.get_channel(rulesChat).mention + " and follow them accordingly.\n"
+    msg += "Also check out " + client.get_channel(announcementsChat).mention
+    msg += " for the latest things happening in the server.\n"
+    await client.send_message(client.get_channel(welcomeChat), msg)
+
+
+@client.event
 async def on_member_remove(member):
     msg = member.mention + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
     await client.send_message(client.get_channel(welcomeChat), msg)
