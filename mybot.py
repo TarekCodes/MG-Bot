@@ -24,7 +24,7 @@ async def on_message(message):
         await client.add_reaction(message, "\U0001F1E6")
         await client.add_reaction(message, "\U0001F1F2")
         await client.add_reaction(message, "\U0001F1EA")
-    if message.content.startswith('$uncone'):
+    if message.content.startswith('$uncone '):
         mentions = message.mentions
         for user in mentions:
             if user.id in coned:
@@ -36,7 +36,7 @@ async def on_message(message):
                 await client.send_message(message.channel, user.mention + " unconed")
             else:
                 await client.send_message(message.channel, user.mention + " wasn't coned")
-    if message.content.startswith('$cone'):
+    if message.content.startswith('$cone '):
         mentions = message.mentions
         for user in mentions:
             coned[user.id] = user.nick
@@ -54,16 +54,19 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, "Currently none")
 
+    if message.content.startswith('$mute '):
+        mentions = message.mentions
+        for user in mentions:
+            overwrite = discord.PermissionOverwrite()
+            overwrite.send_messages = False
+            await client.edit_channel_permissions(message.channel, user, overwrite)
+            await client.send_message(message.channel, user.mention + " has been silenced")
 
-@client.event
-async def on_member_join(member):
-    msg = "Assalamualaikum " + member.mention + "! Welcome to **Muslim Gamers**! Please take a moment to introduce "
-    msg += "yourself! You may only chat here for the time being until you reach lvl 1.\n\n"
-    msg += "**You gain lvls by chatting!**\nAfter reaching lvl 1 you will gain access to the rest of the chats.\n\n"
-    msg += "Feel free to read " + client.get_channel(rulesChat).mention + " and follow them accordingly.\n"
-    msg += "Also check out " + client.get_channel(announcementsChat).mention
-    msg += " for the latest things happening in the server."
-    await client.send_message(client.get_channel(welcomeChat), msg)
+    if message.content.startswith('$unmute '):
+        mentions = message.mentions
+        for user in mentions:
+            await client.delete_channel_permissions(message.channel, user)
+            await client.send_message(message.channel, user.mention + " has been forgiven")
 
 
 @client.event
