@@ -6,6 +6,7 @@ coned = {}
 welcomeChat = '334014732572950528'
 announcementsChat = '349679027126272011'
 rulesChat = '365624761398591489'
+deleteMessage = None
 
 client = discord.Client()
 
@@ -67,6 +68,23 @@ async def on_message(message):
         for user in mentions:
             await client.delete_channel_permissions(message.channel, user)
             await client.send_message(message.channel, user.mention + " has been forgiven")
+
+    if message.content.startswith('$clear '):
+        try:
+            parsed = message.content.split()
+            global deleteMessage
+            deleteMessage = message
+            deleted = await client.purge_from(message.channel, limit=int(parsed[1]), check=is_person)
+            await client.send_message(message.channel, 'Deleted {} message(s)'.format(len(deleted)))
+        except Exception as e:
+            await client.send_message(message.channel, "Invalid Command")
+
+
+def is_person(m):
+    mentions = deleteMessage.mentions
+    if len(mentions) == 0:
+        return True
+    return m.author == deleteMessage.mentions[0]
 
 
 @client.event
