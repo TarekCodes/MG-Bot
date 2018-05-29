@@ -8,6 +8,7 @@ welcomeChat = '334014732572950528'
 announcementsChat = '349679027126272011'
 rulesChat = '365624761398591489'
 deleteMessage = None
+modCommands = ["$uncone ", "$cone ", "$who", "$mute ", "$unmute ", "$clear ", "$custom "]
 
 client = discord.Client()
 dynamo.init()
@@ -15,11 +16,6 @@ dynamo.init()
 
 @client.event
 async def on_message(message):
-    if message.content.startswith(
-            '$') and message.author.top_role.id != '365541261156941829' and message.author.top_role.id != '287369489987928075' and message.author.top_role.id != '192322577207787523' and message.author.top_role.id != '193105896010809344':
-        await client.send_message(message.channel, "YOU DON'T GOT THE POWER!")
-        return
-
     if message.author.id in coned:
         await client.add_reaction(message, "\U0001F4A9")
         await client.add_reaction(message, "\U0001F1F8")
@@ -27,6 +23,11 @@ async def on_message(message):
         await client.add_reaction(message, "\U0001F1E6")
         await client.add_reaction(message, "\U0001F1F2")
         await client.add_reaction(message, "\U0001F1EA")
+
+    if not has_power(message):
+        await client.send_message(message.channel, "YOU DON'T GOT THE POWER!")
+        return
+
     if message.content.startswith('$uncone '):
         mentions = message.mentions
         for user in mentions:
@@ -141,6 +142,14 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+
+
+def has_power(message):
+    for command in modCommands:
+        if message.content.startswith(
+                command) and message.author.top_role.id != '365541261156941829' and message.author.top_role.id != '287369489987928075' and message.author.top_role.id != '192322577207787523' and message.author.top_role.id != '193105896010809344':
+            return False
+    return True
 
 
 client.run(TOKEN)
