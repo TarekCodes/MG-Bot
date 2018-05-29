@@ -1,5 +1,6 @@
 import discord
 import config
+import dynamo
 
 TOKEN = config.botToken
 coned = {}
@@ -9,6 +10,7 @@ rulesChat = '365624761398591489'
 deleteMessage = None
 
 client = discord.Client()
+dynamo.init()
 
 
 @client.event
@@ -37,6 +39,7 @@ async def on_message(message):
                 await client.send_message(message.channel, user.mention + " unconed")
             else:
                 await client.send_message(message.channel, user.mention + " wasn't coned")
+        return
     if message.content.startswith('$cone '):
         mentions = message.mentions
         for user in mentions:
@@ -46,6 +49,7 @@ async def on_message(message):
             except discord.Forbidden:
                 print("Can't change nickname")
             await client.send_message(message.channel, "Shame on you! " + user.mention)
+        return
     if message.content.startswith('$who'):
         msg = ""
         for user in coned:
@@ -54,6 +58,7 @@ async def on_message(message):
             await client.send_message(message.channel, msg)
         else:
             await client.send_message(message.channel, "Currently none")
+        return
 
     if message.content.startswith('$mute '):
         mentions = message.mentions
@@ -62,12 +67,14 @@ async def on_message(message):
             overwrite.send_messages = False
             await client.edit_channel_permissions(message.channel, user, overwrite)
             await client.send_message(message.channel, user.mention + " has been silenced")
+        return
 
     if message.content.startswith('$unmute '):
         mentions = message.mentions
         for user in mentions:
             await client.delete_channel_permissions(message.channel, user)
             await client.send_message(message.channel, user.mention + " has been forgiven")
+        return
 
     if message.content.startswith('$clear '):
         try:
@@ -78,6 +85,30 @@ async def on_message(message):
             await client.send_message(message.channel, 'Deleted {} message(s)'.format(len(deleted)))
         except Exception as e:
             await client.send_message(message.channel, "Invalid Command")
+        return
+
+    if message.content.startswith('$custom '):
+        try:
+            parsed = message.content.split()
+            if len(parsed) < 2:
+                raise Exception()
+            command = parsed[1]
+            value = ""
+            for part in parsed[2:]:
+                value += part + " "
+            if dynamo.add_custom_command(command, value) == "deleted":
+                await client.send_message(message.channel, "Command deleted!")
+            else:
+                await client.send_message(message.channel, "Mission Accomplished")
+        except Exception as e:
+            print(e)
+            await client.send_message(message.channel, "Invalid Command")
+        return
+
+    if message.content.startswith('$'):
+        response = dynamo.get_custom_command(message.content[1:])
+        if response is not None:
+            await client.send_message(message.channel, response)
 
 
 def is_person(m):
