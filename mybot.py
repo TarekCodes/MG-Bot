@@ -1,12 +1,12 @@
-import discord
 import config
 import dynamo
+import discord
 
 TOKEN = config.botToken
 coned = {}
-welcomeChat = '334014732572950528'
-announcementsChat = '349679027126272011'
-rulesChat = '365624761398591489'
+welcomeChat = 334014732572950528
+announcementsChat = 349679027126272011
+rulesChat = 365624761398591489
 deleteMessage = None
 modCommands = ["$uncone ", "$cone ", "$who", "$mute ", "$unmute ", "$clear ", "$custom "]
 
@@ -17,15 +17,15 @@ dynamo.init()
 @client.event
 async def on_message(message):
     if message.author.id in coned:
-        await client.add_reaction(message, "\U0001F4A9")
-        await client.add_reaction(message, "\U0001F1F8")
-        await client.add_reaction(message, "\U0001F1ED")
-        await client.add_reaction(message, "\U0001F1E6")
-        await client.add_reaction(message, "\U0001F1F2")
-        await client.add_reaction(message, "\U0001F1EA")
+        await message.add_reaction("\U0001F4A9")
+        await message.add_reaction("\U0001F1F8")
+        await message.add_reaction("\U0001F1ED")
+        await message.add_reaction("\U0001F1E6")
+        await message.add_reaction("\U0001F1F2")
+        await message.add_reaction("\U0001F1EA")
 
     if not has_power(message):
-        await client.send_message(message.channel, "YOU DON'T GOT THE POWER!")
+        await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
     if message.content.startswith('$uncone '):
@@ -33,32 +33,35 @@ async def on_message(message):
         for user in mentions:
             if user.id in coned:
                 try:
-                    await client.change_nickname(user, coned.get(user.id, None))
+                    await user.edit(nick=coned.get(user.id, None))
                 except discord.Forbidden:
                     print("Can't change nickname")
                 del coned[user.id]
-                await client.send_message(message.channel, user.mention + " unconed")
+                await message.channel.send(user.mention + " unconed")
             else:
-                await client.send_message(message.channel, user.mention + " wasn't coned")
+                await message.channel.send(user.mention + " wasn't coned")
         return
     if message.content.startswith('$cone '):
         mentions = message.mentions
         for user in mentions:
-            coned[user.id] = user.nick
+            if user.nick is None:
+                coned[user.id] = user.name
+            else:
+                coned[user.id] = user.nick
             try:
-                await client.change_nickname(user, "CONE OF SHAME!")
+                await user.edit(nick="CONE OF SHAME!")
             except discord.Forbidden:
                 print("Can't change nickname")
-            await client.send_message(message.channel, "Shame on you! " + user.mention)
+            await message.channel.send("Shame on you! " + user.mention)
         return
     if message.content.startswith('$who'):
         msg = ""
         for user in coned:
             msg = msg + coned.get(user, "") + " "
         if msg != "":
-            await client.send_message(message.channel, msg)
+            await message.channel.send(msg)
         else:
-            await client.send_message(message.channel, "Currently none")
+            await message.channel.send("Currently none")
         return
 
     if message.content.startswith('$mute '):
@@ -66,15 +69,15 @@ async def on_message(message):
         for user in mentions:
             overwrite = discord.PermissionOverwrite()
             overwrite.send_messages = False
-            await client.edit_channel_permissions(message.channel, user, overwrite)
-            await client.send_message(message.channel, user.mention + " has been silenced")
+            await message.channel.set_permissions(user, overwrite=overwrite)
+            await message.channel.send(user.mention + " has been silenced")
         return
 
     if message.content.startswith('$unmute '):
         mentions = message.mentions
         for user in mentions:
-            await client.delete_channel_permissions(message.channel, user)
-            await client.send_message(message.channel, user.mention + " has been forgiven")
+            await message.channel.set_permissions(user, overwrite=None)
+            await message.channel.send(user.mention + " has been forgiven")
         return
 
     if message.content.startswith('$clear '):
@@ -82,10 +85,10 @@ async def on_message(message):
             parsed = message.content.split()
             global deleteMessage
             deleteMessage = message
-            deleted = await client.purge_from(message.channel, limit=int(parsed[1]), check=is_person)
-            await client.send_message(message.channel, 'Deleted {} message(s)'.format(len(deleted)))
+            deleted = await message.channel.purge(limit=int(parsed[1]), check=is_person)
+            await message.channel.send('Deleted {} message(s)'.format(len(deleted)))
         except Exception as e:
-            await client.send_message(message.channel, "Invalid Command")
+            await message.channel.send("Invalid Command")
         return
 
     if message.content.startswith('$custom '):
@@ -98,18 +101,18 @@ async def on_message(message):
             for part in parsed[2:]:
                 value += part + " "
             if dynamo.add_custom_command(command, value) == "deleted":
-                await client.send_message(message.channel, "Command deleted!")
+                await message.channel.send("Command deleted!")
             else:
-                await client.send_message(message.channel, "Mission Accomplished")
+                await message.channel.send("Mission Accomplished")
         except Exception as e:
             print(e)
-            await client.send_message(message.channel, "Invalid Command")
+            await message.channel.send("Invalid Command")
         return
 
     if message.content.startswith('$'):
         response = dynamo.get_custom_command(message.content[1:])
         if response is not None:
-            await client.send_message(message.channel, response)
+            await message.channel.send(response)
 
 
 def is_person(m):
@@ -127,13 +130,13 @@ async def on_member_join(member):
     msg += "Feel free to read " + client.get_channel(rulesChat).mention + " and follow them accordingly.\n"
     msg += "Also check out " + client.get_channel(announcementsChat).mention
     msg += " for the latest things happening in the server.\n"
-    await client.send_message(client.get_channel(welcomeChat), msg)
+    await client.get_channel(welcomeChat).send(msg)
 
 
 @client.event
 async def on_member_remove(member):
     msg = member.mention + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
-    await client.send_message(client.get_channel(welcomeChat), msg)
+    await client.get_channel(welcomeChat).send(msg)
 
 
 @client.event
@@ -147,7 +150,7 @@ async def on_ready():
 def has_power(message):
     for command in modCommands:
         if message.content.startswith(
-                command) and message.author.top_role.id != '365541261156941829' and message.author.top_role.id != '287369489987928075' and message.author.top_role.id != '192322577207787523' and message.author.top_role.id != '193105896010809344':
+                command) and message.author.top_role.id != 365541261156941829 and message.author.top_role.id != 287369489987928075 and message.author.top_role.id != 192322577207787523 and message.author.top_role.id != 193105896010809344:
             return False
     return True
 
