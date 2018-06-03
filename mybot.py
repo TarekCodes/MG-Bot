@@ -173,6 +173,7 @@ async def on_ready():
     print(client.user.id)
     print('------')
     setup_emojis()
+    #await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
@@ -188,21 +189,21 @@ async def set_up_roles_msg():
 
 
 def setup_emojis():
-    roleEmojis["🎵"] = "music haramis"
-    roleEmojis["🏹"] = "Hanzo Mains"
-    roleEmojis["🔫"] = "Rush B Watch Cat"
-    roleEmojis["⚽"] = "Rocket Leaguers"
-    roleEmojis["⛳"] = "Mini Golf Rules"
-    roleEmojis["📖"] = "Book Worms"
     roleEmojis["🃏"] = "Road Blockers"
     roleEmojis["chickenleg"] = "PUBG Crew"
-    roleEmojis["⚛"] = "Dota 2"
+    roleEmojis["🐉"] = "League of Losers"
+    roleEmojis["🏹"] = "Hanzo Mains"
+    roleEmojis["🔫"] = "Rush B Watch Cat"
     roleEmojis["💀"] = "Dead by Daylight"
+    roleEmojis["⚛"] = "Dota 2"
+    roleEmojis["⚽"] = "Rocket Leaguers"
     roleEmojis["💠"] = "Guardians"
     roleEmojis["🛠"] = "Fortniters"
     roleEmojis["🐛"] = "Stick Fightin"
+    roleEmojis["⛳"] = "Mini Golf Rules"
     roleEmojis["🌈"] = "fuzing hostage"
-    roleEmojis["🐉"] = "League of Losers"
+    roleEmojis["📖"] = "Book Worms"
+    roleEmojis["🎵"] = "music haramis"
 
 
 def has_power(message):
