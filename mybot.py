@@ -4,6 +4,8 @@ import discord
 
 TOKEN = config.botToken
 coned = {}
+roleEmojis = {}
+roles_msg = 398539277035896846
 welcomeChat = 334014732572950528
 announcementsChat = 349679027126272011
 rulesChat = 365624761398591489
@@ -140,11 +142,67 @@ async def on_member_remove(member):
 
 
 @client.event
+async def on_raw_reaction_add(emoji, msg_id, channel_id, user_id):
+    if msg_id == roles_msg:
+        guild = client.get_channel(channel_id).guild
+        user = guild.get_member(user_id)
+        role_name = roleEmojis.get(emoji.name, None)
+        if role_name is not None:
+            role = discord.utils.get(guild.roles, name=role_name)
+            await user.add_roles(role, atomic=True)
+
+
+@client.event
+async def on_raw_reaction_remove(emoji, msg_id, channel_id, user_id):
+    if msg_id == roles_msg:
+        guild = client.get_channel(channel_id).guild
+        user = guild.get_member(user_id)
+        role_name = roleEmojis.get(emoji.name, None)
+        if role_name is not None:
+            role = discord.utils.get(guild.roles, name=role_name)
+            try:
+                await user.remove_roles(role, atomic=True)
+            except Exception as e:
+                print("couldn't remove role")
+
+
+@client.event
 async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------')
+    setup_emojis()
+
+
+async def set_up_roles_msg():
+    rules_channel = client.get_channel(rulesChat)
+    msg = await rules_channel.get_message(roles_msg)
+    for emoji in roleEmojis:
+        if emoji == "chickenleg":
+            await msg.remove_reaction(client.get_emoji(319229845957640192), client.user)
+            await msg.add_reaction(client.get_emoji(319229845957640192))
+        else:
+            await msg.remove_reaction(emoji, client.user)
+            await msg.add_reaction(emoji)
+
+
+def setup_emojis():
+    roleEmojis["🎵"] = "music haramis"
+    roleEmojis["🏹"] = "Hanzo Mains"
+    roleEmojis["🔫"] = "Rush B Watch Cat"
+    roleEmojis["⚽"] = "Rocket Leaguers"
+    roleEmojis["⛳"] = "Mini Golf Rules"
+    roleEmojis["📖"] = "Book Worms"
+    roleEmojis["🃏"] = "Road Blockers"
+    roleEmojis["chickenleg"] = "PUBG Crew"
+    roleEmojis["⚛"] = "Dota 2"
+    roleEmojis["💀"] = "Dead by Daylight"
+    roleEmojis["💠"] = "Guardians"
+    roleEmojis["🛠"] = "Fortniters"
+    roleEmojis["🐛"] = "Stick Fightin"
+    roleEmojis["🌈"] = "fuzing hostage"
+    roleEmojis["🐉"] = "League of Losers"
 
 
 def has_power(message):
