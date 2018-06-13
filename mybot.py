@@ -173,7 +173,7 @@ async def on_ready():
     print(client.user.id)
     print('------')
     setup_emojis()
-    #await set_up_roles_msg()
+    # await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
@@ -183,9 +183,13 @@ async def set_up_roles_msg():
         if emoji == "chickenleg":
             await msg.remove_reaction(client.get_emoji(319229845957640192), client.user)
             await msg.add_reaction(client.get_emoji(319229845957640192))
-        else:
-            await msg.remove_reaction(emoji, client.user)
-            await msg.add_reaction(emoji)
+            continue
+        if emoji == "runescape":
+            await msg.remove_reaction(client.get_emoji(455087244898992129), client.user)
+            await msg.add_reaction(client.get_emoji(455087244898992129))
+            continue
+        await msg.remove_reaction(emoji, client.user)
+        await msg.add_reaction(emoji)
 
 
 def setup_emojis():
@@ -195,15 +199,17 @@ def setup_emojis():
     roleEmojis["🏹"] = "Hanzo Mains"
     roleEmojis["🔫"] = "Rush B Watch Cat"
     roleEmojis["💀"] = "Dead by Daylight"
-    roleEmojis["⚛"] = "Dota 2"
-    roleEmojis["⚽"] = "Rocket Leaguers"
+    roleEmojis["⚛"] = "Ancient Defenders"
+    roleEmojis["⚽"] = "Learning to Dribble"
     roleEmojis["💠"] = "Guardians"
-    roleEmojis["🛠"] = "Fortniters"
+    roleEmojis["🛠"] = "Master Builders"
     roleEmojis["🐛"] = "Stick Fightin"
     roleEmojis["⛳"] = "Mini Golf Rules"
     roleEmojis["🌈"] = "fuzing hostage"
-    roleEmojis["📖"] = "Book Worms"
     roleEmojis["🎵"] = "music haramis"
+    roleEmojis["runescape"] = "Osbuddies"
+    roleEmojis["⚔"] = "Dauntless"
+    roleEmojis["💸"] = "Cheap Gamers"
 
 
 def has_power(message):
