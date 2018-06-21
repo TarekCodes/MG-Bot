@@ -5,7 +5,8 @@ import discord
 TOKEN = config.botToken
 coned = {}
 roleEmojis = {}
-roles_msg = 398539277035896846
+customRoleEmojis = {}
+roles_msgs = []
 welcomeChat = 334014732572950528
 announcementsChat = 349679027126272011
 rulesChat = 365624761398591489
@@ -143,7 +144,7 @@ async def on_member_remove(member):
 
 @client.event
 async def on_raw_reaction_add(emoji, msg_id, channel_id, user_id):
-    if msg_id == roles_msg:
+    if msg_id in roles_msgs:
         guild = client.get_channel(channel_id).guild
         user = guild.get_member(user_id)
         role_name = roleEmojis.get(emoji.name, None)
@@ -154,7 +155,7 @@ async def on_raw_reaction_add(emoji, msg_id, channel_id, user_id):
 
 @client.event
 async def on_raw_reaction_remove(emoji, msg_id, channel_id, user_id):
-    if msg_id == roles_msg:
+    if msg_id in roles_msgs:
         guild = client.get_channel(channel_id).guild
         user = guild.get_member(user_id)
         role_name = roleEmojis.get(emoji.name, None)
@@ -173,23 +174,25 @@ async def on_ready():
     print(client.user.id)
     print('------')
     setup_emojis()
-    # await set_up_roles_msg()
+    await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
+    count = 0
+    current_msg = 0
     rules_channel = client.get_channel(rulesChat)
-    msg = await rules_channel.get_message(roles_msg)
+    msg = await rules_channel.get_message(roles_msgs[current_msg])
     for emoji in roleEmojis:
-        if emoji == "chickenleg":
-            await msg.remove_reaction(client.get_emoji(319229845957640192), client.user)
-            await msg.add_reaction(client.get_emoji(319229845957640192))
-            continue
-        if emoji == "runescape":
-            await msg.remove_reaction(client.get_emoji(455087244898992129), client.user)
-            await msg.add_reaction(client.get_emoji(455087244898992129))
-            continue
-        await msg.remove_reaction(emoji, client.user)
-        await msg.add_reaction(emoji)
+        if count >= 18:
+            current_msg += 1
+            msg = await rules_channel.get_message(roles_msgs[current_msg])
+        if emoji in customRoleEmojis:
+            await msg.remove_reaction(client.get_emoji(customRoleEmojis.get(emoji)), client.user)
+            await msg.add_reaction(client.get_emoji(customRoleEmojis.get(emoji)))
+        else:
+            await msg.remove_reaction(emoji, client.user)
+            await msg.add_reaction(emoji)
+        count += 1
 
 
 def setup_emojis():
@@ -205,11 +208,19 @@ def setup_emojis():
     roleEmojis["🛠"] = "Master Builders"
     roleEmojis["🐛"] = "Stick Fightin"
     roleEmojis["⛳"] = "Mini Golf Rules"
-    roleEmojis["🌈"] = "fuzing hostage"
+    roleEmojis["🌈"] = "Fuzing Hostage"
     roleEmojis["🎵"] = "music haramis"
     roleEmojis["runescape"] = "Osbuddies"
     roleEmojis["⚔"] = "Dauntless"
     roleEmojis["💸"] = "Cheap Gamers"
+    roleEmojis["🗺"] = "Skribblio"
+    roleEmojis["🔷"] = "Paladins"
+
+    customRoleEmojis["chickenleg"] = 319229845957640192
+    customRoleEmojis["runescape"] = 455087244898992129
+
+    roles_msgs.append(398539277035896846)
+    roles_msgs.append(458465086693048341)
 
 
 def has_power(message):
