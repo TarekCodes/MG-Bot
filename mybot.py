@@ -12,7 +12,7 @@ announcementsChat = 349679027126272011
 roles_chat = 365624761398591489
 rules_chat = 458786996022673408
 deleteMessage = None
-modCommands = ["$uncone ", "$cone ", "$who", "$mute ", "$unmute ", "$clear ", "$custom "]
+modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom "]
 
 client = discord.Client()
 dynamo.init()
@@ -58,7 +58,7 @@ async def on_message(message):
                 print("Can't change nickname")
             await message.channel.send("Shame on you! " + user.mention)
         return
-    if message.content.startswith('$who'):
+    if message.content.startswith('$coned'):
         msg = ""
         for user in coned:
             msg = msg + coned.get(user, "") + " "
@@ -93,6 +93,10 @@ async def on_message(message):
             await message.channel.send('Deleted {} message(s)'.format(len(deleted)))
         except Exception as e:
             await message.channel.send("Invalid Command")
+        return
+
+    if message.content.startswith('$invitelink'):
+        await message.channel.send("https://discord.gg/ErTb8t3")
         return
 
     if message.content.startswith('$custom '):
@@ -177,7 +181,7 @@ async def on_ready():
     print(client.user.id)
     print('------')
     setup_emojis()
-    await set_up_roles_msg()
+    # await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
