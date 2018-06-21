@@ -9,7 +9,8 @@ customRoleEmojis = {}
 roles_msgs = []
 welcomeChat = 334014732572950528
 announcementsChat = 349679027126272011
-rulesChat = 365624761398591489
+roles_chat = 365624761398591489
+rules_chat = 458786996022673408
 deleteMessage = None
 modCommands = ["$uncone ", "$cone ", "$who", "$mute ", "$unmute ", "$clear ", "$custom "]
 
@@ -129,8 +130,10 @@ def is_person(m):
 async def on_member_join(member):
     msg = "Assalamualaikum " + member.mention + "! Welcome to **Muslim Gamers**! Please take a moment to introduce "
     msg += "yourself! You may only chat here for the time being until you reach lvl 1.\n\n"
-    msg += "**You gain lvls by chatting!**\nAfter reaching lvl 1 you will gain access to the rest of the chats.\n\n"
-    msg += "Feel free to read " + client.get_channel(rulesChat).mention + " and follow them accordingly.\n"
+    msg += "**You gain lvls by chatting!** After reaching lvl 1 you will gain access to the rest of the chats.\n\n"
+    msg += "**Checkout the roles we have over at " + client.get_channel(roles_chat).mention + " and react "
+    msg += "to the messages to give yourself the ones you like.**\n\n"
+    msg += "Feel free to read " + client.get_channel(rules_chat).mention + " and follow them accordingly.\n"
     msg += "Also check out " + client.get_channel(announcementsChat).mention
     msg += " for the latest things happening in the server.\n"
     await client.get_channel(welcomeChat).send(msg)
@@ -180,7 +183,7 @@ async def on_ready():
 async def set_up_roles_msg():
     count = 0
     current_msg = 0
-    rules_channel = client.get_channel(rulesChat)
+    rules_channel = client.get_channel(roles_chat)
     msg = await rules_channel.get_message(roles_msgs[current_msg])
     for emoji in roleEmojis:
         if count >= 18:
