@@ -186,19 +186,19 @@ async def on_ready():
 
 async def set_up_roles_msg():
     count = 0
-    current_msg = 0
     rules_channel = client.get_channel(roles_chat)
-    msg = await rules_channel.get_message(roles_msgs[current_msg])
     for emoji in roleEmojis:
-        if count >= 18:
-            current_msg += 1
-            msg = await rules_channel.get_message(roles_msgs[current_msg])
-        if emoji in customRoleEmojis:
-            await msg.remove_reaction(client.get_emoji(customRoleEmojis.get(emoji)), client.user)
-            await msg.add_reaction(client.get_emoji(customRoleEmojis.get(emoji)))
-        else:
-            await msg.remove_reaction(emoji, client.user)
-            await msg.add_reaction(emoji)
+        for current_msg in roles_msgs:
+            msg = await rules_channel.get_message(current_msg)
+            try:
+                if emoji in customRoleEmojis:
+                    await msg.add_reaction(client.get_emoji(customRoleEmojis.get(emoji)))
+                else:
+                    await msg.add_reaction(emoji)
+                break
+            except Exception as e:
+                print('next msg')
+
         count += 1
 
 
@@ -222,12 +222,15 @@ def setup_emojis():
     roleEmojis["💸"] = "Cheap Gamers"
     roleEmojis["🗺"] = "Skribblio"
     roleEmojis["🔷"] = "Paladins"
+    roleEmojis["🤺"] = "For Honor"
+    roleEmojis["🎣"] = "World of Warcraft"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
 
     roles_msgs.append(398539277035896846)
     roles_msgs.append(458465086693048341)
+    roles_msgs.append(460218391781965824)
 
 
 def has_power(message):
