@@ -12,7 +12,9 @@ announcementsChat = 349679027126272011
 roles_chat = 365624761398591489
 rules_chat = 458786996022673408
 deleteMessage = None
-modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom "]
+modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$fullmute ",
+               "$unfullmute "]
+muted_role = "Muted"
 
 client = discord.Client()
 dynamo.init()
@@ -84,6 +86,27 @@ async def on_message(message):
             await message.channel.send(user.mention + " has been forgiven")
         return
 
+    if message.content.startswith('$fullmute '):
+        mentions = message.mentions
+        overwrite = discord.PermissionOverwrite()
+        overwrite.send_messages = False
+        overwrite.speak = False
+        channels = message.guild.channels
+        for user in mentions:
+            for channel in channels:
+                await channel.set_permissions(user, overwrite=overwrite)
+            await message.channel.send("You're annoying " + user.mention)
+        return
+
+    if message.content.startswith('$unfullmute '):
+        mentions = message.mentions
+        channels = message.guild.channels
+        for user in mentions:
+            for channel in channels:
+                await channel.set_permissions(user, overwrite=None)
+            await message.channel.send("Better not do it again " + user.mention)
+        return
+
     if message.content.startswith('$clear '):
         try:
             parsed = message.content.split()
@@ -145,7 +168,7 @@ async def on_member_join(member):
 
 @client.event
 async def on_member_remove(member):
-    msg = member.mention + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
+    msg = member.mention + " (" + member.name + ") just left **Muslim Gamers**. Bye bye " + member.mention + "..."
     await client.get_channel(welcomeChat).send(msg)
 
 
@@ -185,7 +208,6 @@ async def on_ready():
 
 
 async def set_up_roles_msg():
-    count = 0
     rules_channel = client.get_channel(roles_chat)
     for emoji in roleEmojis:
         for current_msg in roles_msgs:
@@ -198,8 +220,6 @@ async def set_up_roles_msg():
                 break
             except Exception as e:
                 print('next msg')
-
-        count += 1
 
 
 def setup_emojis():
@@ -224,6 +244,8 @@ def setup_emojis():
     roleEmojis["🔷"] = "Paladins"
     roleEmojis["🤺"] = "For Honor"
     roleEmojis["🎣"] = "World of Warcraft"
+    roleEmojis["🎇"] = "StarCraft"
+    roleEmojis["🕋"] = "Team Quran"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
