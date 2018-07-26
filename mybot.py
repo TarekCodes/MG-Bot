@@ -2,6 +2,7 @@ import config
 import dynamo
 import discord
 import moderation
+import miscellaneous as misc
 
 TOKEN = config.botToken
 roleEmojis = {}
@@ -11,10 +12,9 @@ welcomeChat = 334014732572950528
 announcementsChat = 349679027126272011
 roles_chat = 365624761398591489
 rules_chat = 458786996022673408
-deleteMessage = None
-modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$fullmute ",
-               "$unfullmute "]
-muted_role = "Muted"
+
+modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
+               "$serverunmute "]
 
 client = discord.Client()
 dynamo.init()
@@ -31,92 +31,38 @@ async def on_message(message):
 
     if message.content.startswith('$uncone '):
         moderation.uncone(message)
+        return
     if message.content.startswith('$cone '):
         moderation.cone(message)
+        return
     if message.content.startswith('$coned'):
         moderation.get_coned(message)
-
+        return
     if message.content.startswith('$mute '):
-        mentions = message.mentions
-        for user in mentions:
-            overwrite = discord.PermissionOverwrite()
-            overwrite.send_messages = False
-            await message.channel.set_permissions(user, overwrite=overwrite)
-            await message.channel.send(user.mention + " has been silenced")
+        moderation.mute(message)
         return
-
     if message.content.startswith('$unmute '):
-        mentions = message.mentions
-        for user in mentions:
-            await message.channel.set_permissions(user, overwrite=None)
-            await message.channel.send(user.mention + " has been forgiven")
+        moderation.unmute(message)
         return
-
-    if message.content.startswith('$fullmute '):
-        mentions = message.mentions
-        overwrite = discord.PermissionOverwrite()
-        overwrite.send_messages = False
-        overwrite.speak = False
-        channels = message.guild.channels
-        for user in mentions:
-            for channel in channels:
-                await channel.set_permissions(user, overwrite=overwrite)
-            await message.channel.send("You're annoying " + user.mention)
+    if message.content.startswith('$servermute '):
+        moderation.server_mute(message)
         return
-
-    if message.content.startswith('$unfullmute '):
-        mentions = message.mentions
-        channels = message.guild.channels
-        for user in mentions:
-            for channel in channels:
-                await channel.set_permissions(user, overwrite=None)
-            await message.channel.send("Better not do it again " + user.mention)
+    if message.content.startswith('$serverunmute '):
+        moderation.server_unmute(message)
         return
-
     if message.content.startswith('$clear '):
-        try:
-            parsed = message.content.split()
-            global deleteMessage
-            deleteMessage = message
-            deleted = await message.channel.purge(limit=int(parsed[1]), check=is_person)
-            await message.channel.send('Deleted {} message(s)'.format(len(deleted)))
-        except Exception as e:
-            await message.channel.send("Invalid Command")
+        moderation.clear(message)
         return
-
     if message.content.startswith('$invitelink'):
-        await message.channel.send("https://discord.gg/ErTb8t3")
+        misc.invite_link(message)
         return
-
     if message.content.startswith('$custom '):
-        try:
-            parsed = message.content.split()
-            if len(parsed) < 2:
-                raise Exception()
-            command = parsed[1]
-            value = ""
-            for part in parsed[2:]:
-                value += part + " "
-            if dynamo.add_custom_command(command, value) == "deleted":
-                await message.channel.send("Command deleted!")
-            else:
-                await message.channel.send("Mission Accomplished")
-        except Exception as e:
-            print(e)
-            await message.channel.send("Invalid Command")
+        misc.custom(message)
         return
-
     if message.content.startswith('$'):
         response = dynamo.get_custom_command(message.content[1:])
         if response is not None:
             await message.channel.send(response)
-
-
-def is_person(m):
-    mentions = deleteMessage.mentions
-    if len(mentions) == 0:
-        return True
-    return m.author == deleteMessage.mentions[0]
 
 
 @client.event
