@@ -24,3 +24,17 @@ async def custom(message):
         print(e)
         await message.channel.send("Invalid Command")
     return
+
+
+async def help(message):
+    msg = "**$cone <@user1> <@user2> ...**"
+    msg += "\n**$uncone <@user1> <@user2> ...**"
+    msg += "\n**$mute <@user1> <@user2> ...**"
+    msg += "\n**$unmute <@user1> <@user2> ...**"
+    msg += "\n**$servermute <@user1> <@user2> ...** (server-wide mute)"
+    msg += "\n**$serverunmute <@user1> <@user2> ...** (server-wide unmute)"
+    msg += "\n**$clear <#> <@user>** (optionally specify a user to only target him/her)"
+    msg += "\n**$invitelink** (prints an invite to MG)"
+    msg += "\n**$custom <command> <msg to be sent>** (creates/updates a custom command)"
+    msg += "\n**$custom <command>** (deletes an existing command)"
+    await message.channel.send(msg)

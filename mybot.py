@@ -30,39 +30,42 @@ async def on_message(message):
         return
 
     if message.content.startswith('$uncone '):
-        moderation.uncone(message)
+        await moderation.uncone(message)
         return
     if message.content.startswith('$cone '):
-        moderation.cone(message)
+        await moderation.cone(message)
         return
     if message.content.startswith('$coned'):
-        moderation.get_coned(message)
+        await moderation.get_coned(message)
         return
     if message.content.startswith('$mute '):
-        moderation.mute(message)
+        await moderation.mute(message)
         return
     if message.content.startswith('$unmute '):
-        moderation.unmute(message)
+        await moderation.unmute(message)
         return
     if message.content.startswith('$servermute '):
-        moderation.server_mute(message)
+        await moderation.server_mute(message)
         return
     if message.content.startswith('$serverunmute '):
-        moderation.server_unmute(message)
+        await moderation.server_unmute(message)
         return
     if message.content.startswith('$clear '):
-        moderation.clear(message)
+        await moderation.clear(message)
         return
     if message.content.startswith('$invitelink'):
-        misc.invite_link(message)
+        await misc.invite_link(message)
         return
     if message.content.startswith('$custom '):
-        misc.custom(message)
+        await misc.custom(message)
         return
     if message.content.startswith('$'):
         response = dynamo.get_custom_command(message.content[1:])
         if response is not None:
             await message.channel.send(response)
+    if message.content == '$help':
+        await misc.help(message)
+        return
 
 
 @client.event
@@ -116,7 +119,7 @@ async def on_ready():
     print(client.user.id)
     print('------')
     setup_emojis()
-    # await set_up_roles_msg()
+    await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
@@ -158,6 +161,7 @@ def setup_emojis():
     roleEmojis["🎣"] = "World of Warcraft"
     roleEmojis["🎇"] = "StarCraft"
     roleEmojis["🕋"] = "Team Quran"
+    roleEmojis["🤖"] = "Warframe"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
