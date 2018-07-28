@@ -14,7 +14,7 @@ roles_chat = 365624761398591489
 rules_chat = 458786996022673408
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
-               "$serverunmute "]
+               "$serverunmute ", "$help"]
 
 client = discord.Client()
 dynamo.init()
