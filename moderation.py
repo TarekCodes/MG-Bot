@@ -117,7 +117,7 @@ async def mute_channel(message):
     overwrites = channel.overwrites
     muted_channels_overwrites[message.channel.name] = overwrites
     for overwrite in overwrites:
-        if not overwrite[1].manage_messages and overwrite[1].send_messages is not False:
+        if not is_mod(overwrite[0].id) and overwrite[1].send_messages is not False:
             cant_send = discord.PermissionOverwrite()
             cant_send.send_messages = False
             await channel.set_permissions(overwrite[0], overwrite=cant_send)
@@ -141,3 +141,10 @@ def is_person(m):
     if len(mentions) == 0:
         return True
     return m.author == deleteMessage.mentions[0]
+
+
+def is_mod(id):
+    if id == 365541261156941829 or id == 287369489987928075 or id == 192322577207787523 or id == 193105896010809344 \
+            or id == 207996893769236481:
+        return True
+    return False

@@ -38,5 +38,5 @@ async def help(message):
     msg += "\n**$custom <command> <msg to be sent>** (creates/updates a custom command)"
     msg += "\n**$custom <command>** (deletes an existing command)"
     msg += "\n**$mutechannel** (mutes everyone except for mods)"
-    msg += "\n**$umutechannel** (brings the channel back to how it was)"
+    msg += "\n**$unmutechannel** (brings the channel back to how it was)"
     await message.channel.send(msg)
