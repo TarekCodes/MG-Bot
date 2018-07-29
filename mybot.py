@@ -23,7 +23,7 @@ dynamo.init()
 @client.event
 async def on_message(message):
     if moderation.is_coned(message.author.id):
-        moderation.cone_message(message)
+        await moderation.cone_message(message)
 
     if not has_power(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
