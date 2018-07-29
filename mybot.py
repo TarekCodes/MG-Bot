@@ -14,7 +14,7 @@ roles_chat = 365624761398591489
 rules_chat = 458786996022673408
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
-               "$serverunmute ", "$help"]
+               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel"]
 
 client = discord.Client()
 dynamo.init()
@@ -65,6 +65,12 @@ async def on_message(message):
             await message.channel.send(response)
     if message.content == '$help':
         await misc.help(message)
+        return
+    if message.content == '$mutechannel':
+        await moderation.mute_channel(message)
+        return
+    if message.content == '$unmutechannel':
+        await moderation.unmute_channel(message)
         return
 
 
@@ -119,7 +125,7 @@ async def on_ready():
     print(client.user.id)
     print('------')
     setup_emojis()
-    await set_up_roles_msg()
+    # await set_up_roles_msg()
 
 
 async def set_up_roles_msg():

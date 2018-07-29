@@ -2,6 +2,7 @@ import discord
 
 coned = {}
 deleteMessage = None
+muted_channels_overwrites = {}
 
 
 async def uncone(message):
@@ -109,6 +110,30 @@ async def clear(message):
     except Exception as e:
         await message.channel.send("Invalid Command")
     return
+
+
+async def mute_channel(message):
+    channel = message.channel
+    overwrites = channel.overwrites
+    muted_channels_overwrites[message.channel.name] = overwrites
+    for overwrite in overwrites:
+        if not overwrite[1].manage_messages and overwrite[1].send_messages is not False:
+            cant_send = discord.PermissionOverwrite()
+            cant_send.send_messages = False
+            await channel.set_permissions(overwrite[0], overwrite=cant_send)
+    await message.channel.send("YOU SHALL NOT CHAT!")
+
+
+async def unmute_channel(message):
+    channel = message.channel
+    if channel.name not in muted_channels_overwrites:
+        await message.channel.send("Channel wasn't muted")
+        return
+    overwrites = muted_channels_overwrites[channel.name]
+    for overwrite in overwrites:
+        await channel.set_permissions(overwrite[0], overwrite=overwrite[1])
+    del muted_channels_overwrites[channel.name]
+    await message.channel.send("CHAT YOU FOOLS!")
 
 
 def is_person(m):
