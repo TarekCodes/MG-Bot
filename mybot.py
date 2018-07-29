@@ -167,7 +167,7 @@ def setup_emojis():
     roleEmojis["🎣"] = "World of Warcraft"
     roleEmojis["🎇"] = "StarCraft"
     roleEmojis["🕋"] = "Team Quran"
-    roleEmojis["🤖"] = "Warframe"
+    roleEmojis["🤖"] = "TennoFrame"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
