@@ -87,10 +87,10 @@ async def on_member_join(member):
     await client.get_channel(welcomeChat).send(msg)
 
 
-@client.event
-async def on_member_remove(member):
-    msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
-    await client.get_channel(welcomeChat).send(msg)
+# @client.event
+# async def on_member_remove(member):
+#     msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
+#     await client.get_channel(welcomeChat).send(msg)
 
 
 @client.event
@@ -169,6 +169,7 @@ def setup_emojis():
     roleEmojis["🕋"] = "Team Quran"
     roleEmojis["🤖"] = "TennoFrame"
     roleEmojis["🐊"] = "Monster Hunters"
+    roleEmojis["🔄"] = "Nintendo Switch"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
