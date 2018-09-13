@@ -170,6 +170,10 @@ def setup_emojis():
     roleEmojis["🤖"] = "TennoFrame"
     roleEmojis["🐊"] = "Monster Hunters"
     roleEmojis["🔄"] = "Nintendo Switch"
+    roleEmojis["🤠"] = "The Steves"
+    roleEmojis["⛓"] = "Sirat-ul-Exile"
+    roleEmojis["🔰"] = "Keyboard Warriors"
+    roleEmojis["🐸"] = "Fascist Scum"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
