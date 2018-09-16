@@ -10,6 +10,7 @@ customRoleEmojis = {}
 roles_msgs = []
 welcomeChat = 334014732572950528
 announcementsChat = 349679027126272011
+suggestions_chat = 480459932164947969
 roles_chat = 365624761398591489
 rules_chat = 458786996022673408
 
@@ -22,6 +23,10 @@ dynamo.init()
 
 @client.event
 async def on_message(message):
+    if message.guild is None and message.content.startswith('suggestion: '):
+        await misc.new_suggestion(message, client, suggestions_chat)
+        return
+
     if moderation.is_coned(message.author.id):
         await moderation.cone_message(message)
 

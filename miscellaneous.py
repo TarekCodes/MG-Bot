@@ -1,5 +1,9 @@
 import discord
+import datetime
+from datetime import datetime
 import dynamo
+
+default_suggestion_wait = 6
 
 
 async def invite_link(message):
@@ -40,3 +44,20 @@ async def help(message):
     msg += "\n**$mutechannel** (mutes everyone except for mods)"
     msg += "\n**$unmutechannel** (brings the channel back to how it was)"
     await message.channel.send(msg)
+
+
+async def new_suggestion(message, client, suggestions_chat):
+    date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
+    latest_sugg = dynamo.get_latest_suggestion(message)
+    if latest_sugg is not None:
+        old_date = datetime.strptime(latest_sugg['date'], "%Y-%m-%d %H:%M:%S")
+        date_delta = abs(date - old_date)
+        if date_delta.days <= 0 and date_delta.seconds / 3600 < default_suggestion_wait:
+            await message.author.send(
+                "Too soon! You need to wait " + str(
+                    default_suggestion_wait * 60 - int(date_delta.seconds / 60)) + " minutes.")
+            return
+    dynamo.add_new_suggestion(message, date)
+    await client.get_channel(suggestions_chat).send("New Suggestion: " + message.content[message.content.find(' '):])
+    await message.author.send("Thanks for your suggestion!")
+    return
