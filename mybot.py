@@ -13,9 +13,10 @@ announcementsChat = 349679027126272011
 suggestions_chat = 480459932164947969
 roles_chat = 365624761398591489
 rules_chat = 458786996022673408
+bot_log = 245252349587619840
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
-               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel"]
+               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions "]
 
 client = discord.Client()
 dynamo.init()
@@ -76,6 +77,9 @@ async def on_message(message):
         return
     if message.content == '$unmutechannel':
         await moderation.unmute_channel(message)
+        return
+    if message.content.startswith('$suggestions '):
+        await misc.get_suggestions(message, client, bot_log)
         return
 
 

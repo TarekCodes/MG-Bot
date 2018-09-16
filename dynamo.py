@@ -114,4 +114,12 @@ def get_latest_suggestion(message):
     )
     if len(last_suggestion['Items']) == 0:
         return None
-    return last_suggestion['Items'][len(last_suggestion['Items'])-1]
+    return last_suggestion['Items'][len(last_suggestion['Items']) - 1]
+
+
+def get_all_suggestion(user_id):
+    table = session.resource('dynamodb').Table(suggestionsTableName)
+    last_suggestion = table.query(
+        KeyConditionExpression=Key('user_id').eq(user_id)
+    )
+    return last_suggestion['Items']

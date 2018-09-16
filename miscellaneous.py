@@ -3,7 +3,7 @@ import datetime
 from datetime import datetime
 import dynamo
 
-default_suggestion_wait = 6
+default_suggestion_wait = 1
 
 
 async def invite_link(message):
@@ -61,3 +61,20 @@ async def new_suggestion(message, client, suggestions_chat):
     await client.get_channel(suggestions_chat).send("New Suggestion: " + message.content[message.content.find(' '):])
     await message.author.send("Thanks for your suggestion!")
     return
+
+
+async def get_suggestions(message, client, bot_log):
+    parsed = message.content.split()
+    try:
+        if len(parsed) < 2:
+            raise Exception()
+        suggestions = dynamo.get_all_suggestion(parsed[1])
+        print(parsed[1])
+        message = "```User: " + message.guild.get_member(int(parsed[1])).name + "\n\n"
+        for item in suggestions:
+            message += "Date: " + item['date'] + "\n" + item['suggestions'].strip() + "\n\n\n"
+        message += '```'
+        await client.get_channel(bot_log).send(message)
+    except Exception as e:
+        print(str(e))
+        await message.channel.send("Invalid Command")
