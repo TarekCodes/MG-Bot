@@ -24,7 +24,7 @@ dynamo.init()
 
 @client.event
 async def on_message(message):
-    if message.guild is None and message.content.startswith('suggestion: '):
+    if message.guild is None and message.content.lower().startswith('suggestion: '):
         await misc.new_suggestion(message, client, suggestions_chat)
         return
 
