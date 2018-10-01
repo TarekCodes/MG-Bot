@@ -14,9 +14,10 @@ suggestions_chat = 480459932164947969
 roles_chat = 365624761398591489
 rules_chat = 458786996022673408
 bot_log = 245252349587619840
+bot_spam = 463874995169394698
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
-               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions "]
+               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion "]
 
 client = discord.Client()
 dynamo.init()
@@ -81,6 +82,9 @@ async def on_message(message):
     if message.content.startswith('$suggestions '):
         await misc.get_suggestions(message, client, bot_log)
         return
+    if message.content.startswith('$suggestion '):
+        await misc.get_suggestion(message, client, bot_log)
+        return
 
 
 @client.event
@@ -96,10 +100,10 @@ async def on_member_join(member):
     await client.get_channel(welcomeChat).send(msg)
 
 
-# @client.event
-# async def on_member_remove(member):
-#     msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
-#     await client.get_channel(welcomeChat).send(msg)
+@client.event
+async def on_member_remove(member):
+    msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
+    await client.get_channel(bot_spam).send(msg)
 
 
 @client.event

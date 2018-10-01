@@ -43,6 +43,8 @@ async def help(message):
     msg += "\n**$custom <command>** (deletes an existing command)"
     msg += "\n**$mutechannel** (mutes everyone except for mods)"
     msg += "\n**$unmutechannel** (brings the channel back to how it was)"
+    msg += "\n**$suggestion <msg_id>** (prints suggestion info in #bot_log)"
+    msg += "\n**$suggestions <user_id>** (prints all user suggestions in #bot_log)"
     await message.channel.send(msg)
 
 
@@ -57,8 +59,9 @@ async def new_suggestion(message, client, suggestions_chat):
                 "Too soon! You need to wait " + str(
                     default_suggestion_wait * 60 - int(date_delta.seconds / 60)) + " minutes.")
             return
-    dynamo.add_new_suggestion(message, date)
-    await client.get_channel(suggestions_chat).send("New Suggestion: " + message.content[message.content.find(' '):])
+    msg = await client.get_channel(suggestions_chat).send(
+        "New Suggestion: " + message.content[message.content.find(' '):])
+    dynamo.add_new_suggestion(message, date, msg.id)
     await message.author.send("Thanks for your suggestion!")
     return
 
@@ -73,6 +76,25 @@ async def get_suggestions(message, client, bot_log):
         message = "```User: " + message.guild.get_member(int(parsed[1])).name + "\n\n"
         for item in suggestions:
             message += "Date: " + item['date'] + "\n" + item['suggestions'].strip() + "\n\n\n"
+        message += '```'
+        await client.get_channel(bot_log).send(message)
+    except Exception as e:
+        print(str(e))
+        await message.channel.send("Invalid Command")
+
+
+async def get_suggestion(message, client, bot_log):
+    parsed = message.content.split()
+    try:
+        if len(parsed) < 2:
+            raise Exception()
+        suggestion_list = dynamo.get_suggestion(parsed[1])
+        if len(suggestion_list) == 0:
+            await client.get_channel(bot_log).send("Suggestion not found")
+            return
+        suggestion = suggestion_list[0]
+        message = "```User: " + message.guild.get_member(int(suggestion['user_id'])).name + "\n\n"
+        message += "Date: " + suggestion['date'] + "\n" + suggestion['suggestions'].strip() + "\n\n\n"
         message += '```'
         await client.get_channel(bot_log).send(message)
     except Exception as e:

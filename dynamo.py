@@ -97,11 +97,12 @@ def get_custom_command(command):
         return None
 
 
-def add_new_suggestion(message, date):
+def add_new_suggestion(message, date, msg_id):
     table = session.resource('dynamodb').Table(suggestionsTableName)
     table.put_item(Item={
         'user_id': str(message.author.id),
         'date': str(date),
+        'msg_id': str(msg_id),
         'suggestions': message.content[message.content.find(' '):]
     })
     return "done"
@@ -123,3 +124,12 @@ def get_all_suggestion(user_id):
         KeyConditionExpression=Key('user_id').eq(user_id)
     )
     return last_suggestion['Items']
+
+
+def get_suggestion(msg_id):
+    table = session.resource('dynamodb').Table(suggestionsTableName)
+    suggestion = table.query(
+        IndexName='msg_id_index',
+        KeyConditionExpression=Key('msg_id').eq(msg_id)
+    )
+    return suggestion['Items']
