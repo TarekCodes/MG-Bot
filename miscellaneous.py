@@ -6,8 +6,10 @@ import dynamo
 default_suggestion_wait = 1
 
 
-async def invite_link(message):
-    await message.channel.send("https://discord.gg/ErTb8t3")
+async def invite_link(message, client, welcome_chat):
+    invite = await client.get_channel(welcome_chat).create_invite(max_uses=1, max_age=1440,
+                                                                  reason="created by " + str(message.author))
+    await message.channel.send("New invite created for " + message.author.mention + " " + invite.url)
     return
 
 
@@ -38,13 +40,13 @@ async def help(message):
     msg += "\n**$servermute <@user1> <@user2> ...** (server-wide mute)"
     msg += "\n**$serverunmute <@user1> <@user2> ...** (server-wide unmute)"
     msg += "\n**$clear <#> <@user>** (optionally specify a user to only target him/her)"
-    msg += "\n**$invitelink** (prints an invite to MG)"
+    msg += "\n**$invitelink** (Prints a single use invite that expires after 24hrs)"
     msg += "\n**$custom <command> <msg to be sent>** (creates/updates a custom command)"
     msg += "\n**$custom <command>** (deletes an existing command)"
     msg += "\n**$mutechannel** (mutes everyone except for mods)"
     msg += "\n**$unmutechannel** (brings the channel back to how it was)"
     msg += "\n**$suggestion <msg_id>** (prints suggestion info in #bot_log)"
-    msg += "\n**$suggestions <user_id>** (prints all user suggestions in #bot_log)"
+    msg += "\n**$suggestions <user_id>** (prints all suggestions by specified user in #bot_log)"
     await message.channel.send(msg)
 
 

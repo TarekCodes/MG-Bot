@@ -61,7 +61,7 @@ async def on_message(message):
         await moderation.clear(message)
         return
     if message.content.startswith('$invitelink'):
-        await misc.invite_link(message)
+        await misc.invite_link(message, client, welcomeChat)
         return
     if message.content.startswith('$custom '):
         await misc.custom(message)
