@@ -179,7 +179,7 @@ def setup_emojis():
     roleEmojis["🤺"] = "For Honor"
     roleEmojis["🎣"] = "World of Warcraft"
     roleEmojis["🎇"] = "StarCraft"
-    roleEmojis["🕋"] = "Team Quran"
+    roleEmojis["🕋"] = "Lecture"
     roleEmojis["🤖"] = "TennoFrame"
     roleEmojis["🐊"] = "Monster Hunters"
     roleEmojis["🔄"] = "Nintendo Switch"
@@ -187,6 +187,9 @@ def setup_emojis():
     roleEmojis["⛓"] = "Sirat-ul-Exile"
     roleEmojis["🔰"] = "Keyboard Warriors"
     roleEmojis["🐸"] = "Fascist Scum"
+    roleEmojis["🏳"] = "Farm Simulator"
+    roleEmojis["🏳"] = "TennoFrame"
+    roleEmojis["👊🏾"] = "Button Mashers"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
