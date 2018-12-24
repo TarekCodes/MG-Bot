@@ -3,6 +3,7 @@ import dynamo
 import discord
 import moderation
 import miscellaneous as misc
+import reddit
 
 TOKEN = config.botToken
 roleEmojis = {}
@@ -17,7 +18,7 @@ bot_log = 245252349587619840
 bot_spam = 463874995169394698
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
-               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion "]
+               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit "]
 
 client = discord.Client()
 dynamo.init()
@@ -84,6 +85,9 @@ async def on_message(message):
         return
     if message.content.startswith('$suggestion '):
         await misc.get_suggestion(message, client, bot_log)
+        return
+    if message.content.startswith('$reddit '):
+        await reddit.get_top_post(message)
         return
 
 
