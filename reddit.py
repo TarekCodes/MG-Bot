@@ -1,5 +1,6 @@
 import praw
 import config
+import requests
 
 
 def init_reddit():
@@ -24,7 +25,15 @@ async def get_top_post(message):
     except Exception as e:
         await message.channel.send("Invalid Command")
         return
-    await message.channel.send(post.shortlink)
+    post_link = config.reddit_url + post.permalink
+    if len(post.selftext) > 5:
+        await message.channel.send(post_link)
+        return
+    post_json = requests.get(url=post_link[:-1] + ".json", headers={'User-agent': config.clienetID}).json()
+    if post.is_video:
+        await message.channel.send(post_json[0]["data"]["children"][0]["data"]["media"]["reddit_video"]["fallback_url"])
+        return
+    await message.channel.send(post_json[0]["data"]["children"][0]["data"]["url"])
     # length = len(post.selftext)
     # if length > 1990:
     #     count = 0
