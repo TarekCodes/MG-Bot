@@ -206,7 +206,7 @@ def setup_emojis():
 def has_power(message):
     for command in modCommands:
         if message.content.startswith(
-                command) and message.author.top_role.id != 365541261156941829 and message.author.top_role.id != 287369489987928075 and message.author.top_role.id != 192322577207787523 and message.author.top_role.id != 193105896010809344:
+                command) and message.author.top_role.id != 365541261156941829 and message.author.top_role.id != 287369489987928075 and message.author.top_role.id != 192322577207787523 and message.author.top_role.id != 193105896010809344 and message.author.top_role.id != 207996893769236481:
             return False
     return True
 
