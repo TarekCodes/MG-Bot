@@ -18,7 +18,8 @@ bot_log = 245252349587619840
 bot_spam = 463874995169394698
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
-               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit "]
+               "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
+               "$getallcustom"]
 
 client = discord.Client()
 dynamo.init()
@@ -71,6 +72,10 @@ async def on_message(message):
         response = dynamo.get_custom_command(message.content[1:])
         if response is not None:
             await message.channel.send(response)
+    if message.content == "$getallcustom":
+        response = dynamo.get_all_custom()
+        for msg in response:
+            await message.channel.send(msg)
     if message.content == '$help':
         await misc.help(message)
         return

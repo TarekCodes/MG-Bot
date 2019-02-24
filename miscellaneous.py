@@ -43,10 +43,12 @@ async def help(message):
     msg += "\n**$invitelink** (Prints a single use invite that expires after 24hrs)"
     msg += "\n**$custom <command> <msg to be sent>** (creates/updates a custom command)"
     msg += "\n**$custom <command>** (deletes an existing command)"
+    msg += "\n**$getallcustom** (prints all custom commands currently configured)"
     msg += "\n**$mutechannel** (mutes everyone except for mods)"
     msg += "\n**$unmutechannel** (brings the channel back to how it was)"
     msg += "\n**$suggestion <msg_id>** (prints suggestion info in #bot_log)"
     msg += "\n**$suggestions <user_id>** (prints all suggestions by specified user in #bot_log)"
+    msg += "\n**$reddit <sub-reddit> <period> <#>** (gets top post or whatever number if period is specified)"
     await message.channel.send(msg)
 
 
@@ -70,16 +72,22 @@ async def new_suggestion(message, client, suggestions_chat):
 
 async def get_suggestions(message, client, bot_log):
     parsed = message.content.split()
+    msgs = []
     try:
         if len(parsed) < 2:
             raise Exception()
         suggestions = dynamo.get_all_suggestion(parsed[1])
         print(parsed[1])
-        message = "```User: " + message.guild.get_member(int(parsed[1])).name + "\n\n"
+        current = "```User: " + message.guild.get_member(int(parsed[1])).name + "```\n\n"
         for item in suggestions:
-            message += "Date: " + item['date'] + "\n" + item['suggestions'].strip() + "\n\n\n"
-        message += '```'
-        await client.get_channel(bot_log).send(message)
+            addition = "```Date: " + item['date'] + "\n" + item['suggestions'].strip() + "```\n\n"
+            if len(current + addition) >= 2000:
+                msgs.append(current)
+                current = ""
+            current += addition
+        msgs.append(current)
+        for item in msgs:
+            await client.get_channel(bot_log).send(item)
     except Exception as e:
         print(str(e))
         await message.channel.send("Invalid Command")

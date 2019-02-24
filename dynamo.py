@@ -133,3 +133,18 @@ def get_suggestion(msg_id):
         KeyConditionExpression=Key('msg_id').eq(msg_id)
     )
     return suggestion['Items']
+
+
+def get_all_custom():
+    result = []
+    current = ""
+    table = session.resource('dynamodb').Table(customTableName)
+    items = table.scan()
+    for custom in items['Items']:
+        addition = "```" + custom['command'] + "\t" + custom['value'] + "```"
+        if len(current + addition) >= 2000:
+            result.append(current)
+            current = ""
+        current += addition
+    result.append(current)
+    return result
