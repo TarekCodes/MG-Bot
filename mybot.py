@@ -192,8 +192,8 @@ def setup_emojis():
     roleEmojis["🔰"] = "Keyboard Warriors"
     roleEmojis["🐸"] = "Fascist Scum"
     roleEmojis["🏳"] = "Farm Simulator"
-    roleEmojis["🏳"] = "TennoFrame"
     roleEmojis["👊🏾"] = "Button Mashers"
+    roleEmojis["🎮"] = "Apex Legends"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
