@@ -199,6 +199,7 @@ def setup_emojis():
     roleEmojis["🏳"] = "Farm Simulator"
     roleEmojis["👊🏾"] = "Button Mashers"
     roleEmojis["🎮"] = "Apex Legends"
+    roleEmojis["🇱"] = "League of Losers EU"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
