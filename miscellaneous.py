@@ -2,8 +2,10 @@ import discord
 import datetime
 from datetime import datetime
 import dynamo
+import requests
 
 default_suggestion_wait = 1
+url = "https://opentdb.com/api.php?amount=1&type=multiple"
 
 
 async def invite_link(message, client, welcome_chat):
@@ -110,3 +112,47 @@ async def get_suggestion(message, client, bot_log):
     except Exception as e:
         print(str(e))
         await message.channel.send("Invalid Command")
+
+
+async def get_question(message):
+    response = requests.get(url).json()
+    question = decoder(response["results"][0]["question"])
+    answer = decoder(response["results"][0]["correct_answer"])
+    question_id = dynamo.new_question(question, answer)
+    await message.channel.send("Question #" + str(question_id) + ": " + question)
+
+
+async def answer_question(message):
+    try:
+        parsed = message.content.split()
+        if len(parsed) < 2:
+            raise Exception()
+        question_id = parsed[1]
+        answer = ""
+        for part in parsed[2:]:
+            answer += part + " "
+        correct_answer = dynamo.get_answer(int(question_id))
+        if correct_answer is None:
+            await message.channel.send("Question not found.")
+            return
+        if correct_answer.strip().lower() == answer.strip().lower():
+            dynamo.delete_question(int(question_id))
+            score = dynamo.increment_score(message)
+            await message.add_reaction("🌟")
+            await message.channel.send("Correct answer!!! Your score is now " + str(score))
+        else:
+            await message.add_reaction("❌")
+            await message.channel.send("Wrong answer. Loser.")
+    except Exception as e:
+        print(e)
+        await message.channel.send("Invalid command.")
+    return
+
+
+async def get_score(message):
+    await message.channel.send("Your current score is: " + str(dynamo.get_score(message)))
+
+
+def decoder(content):
+    new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&‌amp;", "&")
+    return new

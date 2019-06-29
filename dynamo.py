@@ -1,10 +1,13 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+from datetime import datetime
 
 session = boto3.Session(profile_name='tarek')
 dynamodb = session.client('dynamodb')
 customTableName = 'mg_custom'
 suggestionsTableName = 'mg_suggestions'
+questionsTableName = 'mg_questions'
+scoresTableName = 'mg_scores'
 
 
 def init():
@@ -64,6 +67,56 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=suggestionsTableName)
+
+    try:
+        dynamodb.describe_table(TableName=questionsTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=questionsTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'id',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'id',
+                    'AttributeType': 'N'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 5,
+                'WriteCapacityUnits': 5
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=questionsTableName)
+
+    try:
+        dynamodb.describe_table(TableName=scoresTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=scoresTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'id',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'id',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 5,
+                'WriteCapacityUnits': 5
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=questionsTableName)
 
 
 def add_custom_command(command, value):
@@ -148,3 +201,79 @@ def get_all_custom():
         current += addition
     result.append(current)
     return result
+
+
+def new_question(question, answer):
+    table = session.resource('dynamodb').Table(questionsTableName)
+    question_id = datetime.now().microsecond
+    table.put_item(Item={
+        'id': question_id,
+        'question': question,
+        'answer': answer
+    })
+    return question_id
+
+
+def get_answer(question_id):
+    try:
+        table = session.resource('dynamodb').Table(questionsTableName)
+        response = table.get_item(
+            Key={
+                'id': question_id
+            }
+        )
+        answer = response['Item']['answer']
+        return answer
+    except Exception:
+        return None
+
+
+def delete_question(question_id):
+    table = session.resource('dynamodb').Table(questionsTableName)
+    table.delete_item(
+        Key={
+            'id': question_id,
+        }
+    )
+    return "deleted"
+
+
+def increment_score(message):
+    table = session.resource('dynamodb').Table(scoresTableName)
+    user_id = str(message.guild.id) + "_" + str(message.author.id)
+    try:
+        response = table.get_item(
+            Key={
+                'id': user_id
+            }
+        )
+        new_score = response['Item']['score'] + 1
+        table.put_item(Item={
+            'id': user_id,
+            'score': new_score,
+        })
+        return new_score
+    except Exception:
+        table.put_item(Item={
+            'id': user_id,
+            'score': 1,
+        })
+        return 1
+
+
+def get_score(message):
+    table = session.resource('dynamodb').Table(scoresTableName)
+    user_id = str(message.guild.id) + "_" + str(message.author.id)
+    try:
+        response = table.get_item(
+            Key={
+                'id': user_id
+            }
+        )
+        return response['Item']['score']
+    except Exception:
+        table.put_item(Item={
+            'id': user_id,
+            'score': 0,
+        })
+        return 0
