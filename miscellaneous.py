@@ -53,12 +53,21 @@ async def help(message):
     msg += "\n**$suggestion <msg_id>** (prints suggestion info in #bot_log)"
     msg += "\n**$suggestions <user_id>** (prints all suggestions by specified user in #bot_log)"
     msg += "\n**$reddit <sub-reddit> <period> <#>** (gets top post or whatever number if period is specified)"
+    msg += "\n**$suggestionsban <user_id>** (ban user from making suggestions)"
+    msg += "\n**$suggestionsunban <user_id>** (unban user from making suggestions)"
+    msg += "\n**$question** (sends a random trivia questions in the chat)"
+    msg += "\n**$answer <question #> <answer>** (answers a trivia question by providing the question number and answer)"
+    msg += "\n**$score** (gets your current trivia score)"
+    msg += "\n**$fightme <@user>** (simulates a rock-paper-scissors game between 2 people to solve problems :D)"
+
     await message.channel.send(msg)
 
 
 async def new_suggestion(message, client, suggestions_chat):
     date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
     latest_sugg = dynamo.get_latest_suggestion(message)
+    if dynamo.is_suggestion_banned(message.author.id) is not None:
+        await message.author.send("You've been banned from making suggestions :(")
     if latest_sugg is not None:
         old_date = datetime.strptime(latest_sugg['date'], "%Y-%m-%d %H:%M:%S")
         date_delta = abs(date - old_date)
@@ -169,3 +178,27 @@ async def fight(message):
     hand, emoji = random.choice(list(throwdown.items()))
     await message.channel.send(author.mention + " played " + hand + " " + emoji)
     return
+
+
+async def ban_suggestions(message):
+    parsed = message.content.split()
+    try:
+        if len(parsed) < 2:
+            raise Exception()
+        dynamo.new_suggestion_ban(parsed[1])
+        await message.channel.send("User banned from making suggestions")
+    except Exception as e:
+        print(str(e))
+        await message.channel.send("Invalid Command")
+
+
+async def unban_suggestions(message):
+    parsed = message.content.split()
+    try:
+        if len(parsed) < 2:
+            raise Exception()
+        dynamo.suggestion_unban(parsed[1])
+        await message.channel.send("User can make suggestions again")
+    except Exception as e:
+        print(str(e))
+        await message.channel.send("Invalid Command")

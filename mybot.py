@@ -80,6 +80,12 @@ async def on_message(message):
     if message.content.startswith('$fightme '):
         await misc.fight(message)
         return
+    if message.content.startswith('$suggestionsban '):
+        await misc.ban_suggestions(message)
+        return
+    if message.content.startswith('$suggestionsunban '):
+        await misc.unban_suggestions(message)
+        return
     if message.content.startswith('$'):
         response = dynamo.get_custom_command(message.content[1:])
         if response is not None:

@@ -8,6 +8,7 @@ customTableName = 'mg_custom'
 suggestionsTableName = 'mg_suggestions'
 questionsTableName = 'mg_questions'
 scoresTableName = 'mg_scores'
+suggestionBansTableName = 'mg_suggestion_bans'
 
 
 def init():
@@ -35,6 +36,32 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=customTableName)
+
+    try:
+        dynamodb.describe_table(TableName=suggestionBansTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=suggestionBansTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'user_id',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'user_id',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 5,
+                'WriteCapacityUnits': 5
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=suggestionBansTableName)
+
     try:
         dynamodb.describe_table(TableName=suggestionsTableName)
     except Exception:
@@ -277,3 +304,35 @@ def get_score(message):
             'score': 0,
         })
         return 0
+
+
+def new_suggestion_ban(user_id):
+    table = session.resource('dynamodb').Table(suggestionBansTableName)
+    table.put_item(Item={
+        'user_id': str(user_id),
+    })
+    return "done"
+
+
+def is_suggestion_banned(user_id):
+    try:
+        table = session.resource('dynamodb').Table(suggestionBansTableName)
+        response = table.get_item(
+            Key={
+                'user_id': user_id
+            }
+        )
+        answer = response['Item']['user_id']
+        return answer
+    except Exception:
+        return None
+
+
+def suggestion_unban(user_id):
+    table = session.resource('dynamodb').Table(suggestionBansTableName)
+    table.delete_item(
+        Key={
+            'user_id': user_id,
+        }
+    )
+    return "deleted"
