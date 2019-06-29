@@ -166,7 +166,7 @@ async def get_score(message):
 
 
 def decoder(content):
-    new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&‌amp;", "&")
+    new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&amp;", "&")
     return new
 
 
