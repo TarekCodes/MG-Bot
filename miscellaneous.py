@@ -53,8 +53,8 @@ async def help(message):
     msg += "\n**$suggestion <msg_id>** (prints suggestion info in #bot_log)"
     msg += "\n**$suggestions <user_id>** (prints all suggestions by specified user in #bot_log)"
     msg += "\n**$reddit <sub-reddit> <period> <#>** (gets top post or whatever number if period is specified)"
-    msg += "\n**$suggestionsban <user_id>** (ban user from making suggestions)"
-    msg += "\n**$suggestionsunban <user_id>** (unban user from making suggestions)"
+    msg += "\n**$bansuggestions <user_id>** (ban user from making suggestions)"
+    msg += "\n**$unbansuggestions <user_id>** (unban user from making suggestions)"
     msg += "\n**$question** (sends a random trivia questions in the chat)"
     msg += "\n**$answer <question #> <answer>** (answers a trivia question by providing the question number and answer)"
     msg += "\n**$score** (gets your current trivia score)"
@@ -68,6 +68,7 @@ async def new_suggestion(message, client, suggestions_chat):
     latest_sugg = dynamo.get_latest_suggestion(message)
     if dynamo.is_suggestion_banned(message.author.id) is not None:
         await message.author.send("You've been banned from making suggestions :(")
+        return
     if latest_sugg is not None:
         old_date = datetime.strptime(latest_sugg['date'], "%Y-%m-%d %H:%M:%S")
         date_delta = abs(date - old_date)

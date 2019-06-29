@@ -319,12 +319,13 @@ def is_suggestion_banned(user_id):
         table = session.resource('dynamodb').Table(suggestionBansTableName)
         response = table.get_item(
             Key={
-                'user_id': user_id
+                'user_id': str(user_id)
             }
         )
-        answer = response['Item']['user_id']
-        return answer
-    except Exception:
+        found = response['Item']['user_id']
+        return found
+    except Exception as e:
+        print(e)
         return None
 
 

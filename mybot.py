@@ -80,10 +80,10 @@ async def on_message(message):
     if message.content.startswith('$fightme '):
         await misc.fight(message)
         return
-    if message.content.startswith('$suggestionsban '):
+    if message.content.startswith('$bansuggestions '):
         await misc.ban_suggestions(message)
         return
-    if message.content.startswith('$suggestionsunban '):
+    if message.content.startswith('$unbansuggestions '):
         await misc.unban_suggestions(message)
         return
     if message.content.startswith('$'):
