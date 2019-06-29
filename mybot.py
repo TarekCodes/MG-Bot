@@ -69,13 +69,13 @@ async def on_message(message):
         await misc.custom(message)
         return
     if message.content.startswith('$question'):
-        await entertainment.get_question(message)
+        await misc.get_question(message)
         return
     if message.content.startswith('$answer '):
-        await entertainment.answer_question(message)
+        await misc.answer_question(message)
         return
     if message.content.startswith('$score'):
-        await entertainment.get_score(message)
+        await misc.get_score(message)
         return
     if message.content.startswith('$'):
         response = dynamo.get_custom_command(message.content[1:])
