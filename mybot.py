@@ -77,6 +77,9 @@ async def on_message(message):
     if message.content.startswith('$score'):
         await misc.get_score(message)
         return
+    if message.content.startswith('$fightme '):
+        await misc.fight(message)
+        return
     if message.content.startswith('$'):
         response = dynamo.get_custom_command(message.content[1:])
         if response is not None:

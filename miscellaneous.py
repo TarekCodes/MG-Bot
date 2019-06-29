@@ -3,9 +3,11 @@ import datetime
 from datetime import datetime
 import dynamo
 import requests
+import random
 
 default_suggestion_wait = 1
 url = "https://opentdb.com/api.php?amount=1&type=multiple"
+throwdown = {"rock": "\u270A", "paper": "\u270B", "scissor": "\u270C"}
 
 
 async def invite_link(message, client, welcome_chat):
@@ -156,3 +158,14 @@ async def get_score(message):
 def decoder(content):
     new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&‌amp;", "&")
     return new
+
+
+async def fight(message):
+    mentions = message.mentions
+    author = message.author
+    for user in mentions:
+        hand, emoji = random.choice(list(throwdown.items()))
+        await message.channel.send(user.mention + " played " + hand + " " + emoji)
+    hand, emoji = random.choice(list(throwdown.items()))
+    await message.channel.send(author.mention + " played " + hand + " " + emoji)
+    return
