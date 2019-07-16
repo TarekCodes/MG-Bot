@@ -19,7 +19,7 @@ bot_spam = 463874995169394698
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
-               "$getallcustom"]
+               "$getallcustom", "$phrase ", "$question"]
 
 client = discord.Client()
 dynamo.init()
@@ -80,6 +80,9 @@ async def on_message(message):
     if message.content.startswith('$fightme '):
         await misc.fight(message)
         return
+    if message.content.startswith('$phrase '):
+        await misc.new_phrase(message)
+        return
     if message.content.startswith('$bansuggestions '):
         await misc.ban_suggestions(message)
         return
@@ -111,6 +114,11 @@ async def on_message(message):
         return
     if message.content.startswith('$reddit '):
         await reddit.get_top_post(message)
+        return
+    # handle phrase
+    val = dynamo.get_phrase(message.content)
+    if val is not None:
+        await message.channel.send(val)
         return
 
 

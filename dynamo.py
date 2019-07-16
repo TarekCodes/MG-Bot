@@ -9,6 +9,7 @@ suggestionsTableName = 'mg_suggestions'
 questionsTableName = 'mg_questions'
 scoresTableName = 'mg_scores'
 suggestionBansTableName = 'mg_suggestion_bans'
+phraseTableName = 'bot_phrase'
 
 
 def init():
@@ -144,6 +145,31 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=questionsTableName)
+
+    try:
+        dynamodb.describe_table(TableName=phraseTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=phraseTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'phrase',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'phrase',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 5,
+                'WriteCapacityUnits': 5
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=customTableName)
 
 
 def add_custom_command(command, value):
@@ -337,3 +363,33 @@ def suggestion_unban(user_id):
         }
     )
     return "deleted"
+
+
+def add_phrase(phrase, value):
+    table = session.resource('dynamodb').Table(phraseTableName)
+    if value == "":
+        table.delete_item(
+            Key={
+                'phrase': phrase,
+            }
+        )
+        return "deleted"
+    table.put_item(Item={
+        'phrase': phrase,
+        'value': value
+    })
+    return "done"
+
+
+def get_phrase(phrase):
+    try:
+        table = session.resource('dynamodb').Table(phraseTableName)
+        response = table.get_item(
+            Key={
+                'phrase': phrase
+            }
+        )
+        value = response['Item']['value']
+        return value
+    except Exception:
+        return None
