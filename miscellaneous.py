@@ -59,6 +59,7 @@ async def help(message):
     msg += "\n**$answer <question #> <answer>** (answers a trivia question by providing the question number and answer)"
     msg += "\n**$score** (gets your current trivia score)"
     msg += "\n**$fightme <@user>** (simulates a rock-paper-scissors game between 2 people to solve problems :D)"
+    msg += "\n**phrase <\"phrase\"> <msg to be sent>** (creates/updates a custom msg when a phrase is sent)"
 
     await message.channel.send(msg)
 
