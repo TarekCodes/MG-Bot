@@ -9,7 +9,7 @@ suggestionsTableName = 'mg_suggestions'
 questionsTableName = 'mg_questions'
 scoresTableName = 'mg_scores'
 suggestionBansTableName = 'mg_suggestion_bans'
-phraseTableName = 'bot_phrase'
+phraseTableName = 'mg_phrase'
 
 
 def init():
