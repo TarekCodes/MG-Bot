@@ -10,6 +10,7 @@ questionsTableName = 'mg_questions'
 scoresTableName = 'mg_scores'
 suggestionBansTableName = 'mg_suggestion_bans'
 phraseTableName = 'mg_phrase'
+phrase_cache = {}
 
 
 def init():
@@ -170,6 +171,7 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=customTableName)
+    scan_for_phrases()
 
 
 def add_custom_command(command, value):
@@ -378,18 +380,18 @@ def add_phrase(phrase, value):
         'phrase': phrase,
         'value': value
     })
+    scan_for_phrases()
     return "done"
 
 
 def get_phrase(phrase):
-    try:
-        table = session.resource('dynamodb').Table(phraseTableName)
-        response = table.get_item(
-            Key={
-                'phrase': phrase
-            }
-        )
-        value = response['Item']['value']
-        return value
-    except Exception:
-        return None
+    if phrase in phrase_cache:
+        return phrase_cache[phrase]
+    return None
+
+
+def scan_for_phrases():
+    table = session.resource('dynamodb').Table(phraseTableName)
+    response = table.scan()
+    for i in response['Items']:
+        phrase_cache[i['phrase']] = i['value']

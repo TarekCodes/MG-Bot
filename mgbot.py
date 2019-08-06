@@ -117,7 +117,7 @@ async def on_message(message):
         return
     # handle phrase
     val = dynamo.get_phrase(message.content)
-    if val is not None:
+    if val is not None and message.author.id != client.user.id:
         await message.channel.send(val)
         return
 
