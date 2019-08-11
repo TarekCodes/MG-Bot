@@ -115,6 +115,12 @@ async def on_message(message):
     if message.content.startswith('$reddit '):
         await reddit.get_top_post(message)
         return
+    if message.content.startswith('$startgiveaway '):
+        await misc.start_giveaway(message)
+        return
+    if message.content.startswith('$endgiveaway '):
+        await misc.end_giveaway(client, message)
+        return
     # handle phrase
     val = dynamo.get_phrase(message.content)
     if val is not None and message.author.id != client.user.id:
@@ -143,6 +149,11 @@ async def on_member_remove(member):
 
 @client.event
 async def on_raw_reaction_add(emoji, msg_id, channel_id, user_id):
+    # handle giveaways
+    if dynamo.get_giveaway(msg_id) is not None and emoji.name == "🏆" and user_id != 447970747076575232:
+        dynamo.new_giveaway_entry(user_id, msg_id)
+        await client.get_channel(channel_id).guild.get_member(user_id).send(
+            "You have been entered in the giveaway. Good luck!")
     if msg_id in roles_msgs:
         guild = client.get_channel(channel_id).guild
         user = guild.get_member(user_id)
@@ -154,6 +165,11 @@ async def on_raw_reaction_add(emoji, msg_id, channel_id, user_id):
 
 @client.event
 async def on_raw_reaction_remove(emoji, msg_id, channel_id, user_id):
+    # handle giveaways
+    if dynamo.get_giveaway(msg_id) is not None and emoji.name == "🏆":
+        dynamo.delete_giveaway_entry(user_id, msg_id)
+        await client.get_channel(channel_id).guild.get_member(user_id).send(
+            "Your entry has been removed.")
     if msg_id in roles_msgs:
         guild = client.get_channel(channel_id).guild
         user = guild.get_member(user_id)

@@ -1,6 +1,7 @@
 import boto3
 from boto3.dynamodb.conditions import Key
 from datetime import datetime
+import random
 
 session = boto3.Session(profile_name='tarek')
 dynamodb = session.client('dynamodb')
@@ -10,7 +11,10 @@ questionsTableName = 'mg_questions'
 scoresTableName = 'mg_scores'
 suggestionBansTableName = 'mg_suggestion_bans'
 phraseTableName = 'mg_phrase'
+giveawaysTableName = 'mg_giveaways'
+giveawayEntriesTableName = 'mg_giveaway_entries'
 phrase_cache = {}
+giveaways_cache = {}
 
 
 def init():
@@ -32,8 +36,8 @@ def init():
                 }
             ],
             ProvisionedThroughput={
-                'ReadCapacityUnits': 5,
-                'WriteCapacityUnits': 5
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
             }
         )
         print("Table not found")
@@ -57,8 +61,8 @@ def init():
                 }
             ],
             ProvisionedThroughput={
-                'ReadCapacityUnits': 5,
-                'WriteCapacityUnits': 5
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
             }
         )
         print("Table not found")
@@ -90,8 +94,8 @@ def init():
                 }
             ],
             ProvisionedThroughput={
-                'ReadCapacityUnits': 5,
-                'WriteCapacityUnits': 5
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
             }
         )
         print("Table not found")
@@ -115,8 +119,8 @@ def init():
                 }
             ],
             ProvisionedThroughput={
-                'ReadCapacityUnits': 5,
-                'WriteCapacityUnits': 5
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
             }
         )
         print("Table not found")
@@ -140,8 +144,8 @@ def init():
                 }
             ],
             ProvisionedThroughput={
-                'ReadCapacityUnits': 5,
-                'WriteCapacityUnits': 5
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
             }
         )
         print("Table not found")
@@ -165,13 +169,72 @@ def init():
                 }
             ],
             ProvisionedThroughput={
-                'ReadCapacityUnits': 5,
-                'WriteCapacityUnits': 5
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
             }
         )
         print("Table not found")
-        dynamodb.get_waiter('table_exists').wait(TableName=customTableName)
+        dynamodb.get_waiter('table_exists').wait(TableName=phraseTableName)
+
+    try:
+        dynamodb.describe_table(TableName=giveawaysTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=giveawaysTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'giveaway_id',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'giveaway_id',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=giveawaysTableName)
+
+    try:
+        dynamodb.describe_table(TableName=giveawayEntriesTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=giveawayEntriesTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'giveaway_id',
+                    'KeyType': 'HASH'
+                },
+                {
+                    'AttributeName': 'user_id',
+                    'KeyType': 'RANGE'  # Sort key
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'giveaway_id',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'user_id',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=giveawayEntriesTableName)
     scan_for_phrases()
+    scan_for_giveaways()
 
 
 def add_custom_command(command, value):
@@ -395,3 +458,73 @@ def scan_for_phrases():
     response = table.scan()
     for i in response['Items']:
         phrase_cache[i['phrase']] = i['value']
+
+
+def scan_for_giveaways():
+    table = session.resource('dynamodb').Table(giveawaysTableName)
+    response = table.scan()
+    for i in response['Items']:
+        giveaways_cache[i['giveaway_id']] = i['end_date']
+
+
+def new_giveaway(giveaway_id, end_date, prize):
+    table = session.resource('dynamodb').Table(giveawaysTableName)
+    table.put_item(Item={
+        'giveaway_id': str(giveaway_id),
+        'end_date': end_date,
+        'prize': prize
+    })
+    scan_for_giveaways()
+    return giveaway_id
+
+
+def new_giveaway_entry(user_id, giveaway_id):
+    end_date = datetime.strptime(get_giveaway(giveaway_id), "%Y-%m-%d %H:%M:%S")
+    date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
+    if end_date < date:
+        return
+    table = session.resource('dynamodb').Table(giveawayEntriesTableName)
+    table.put_item(Item={
+        'giveaway_id': str(giveaway_id),
+        'user_id': str(user_id)
+    })
+    return giveaway_id
+
+
+def delete_giveaway_entry(user_id, giveaway_id):
+    table = session.resource('dynamodb').Table(giveawayEntriesTableName)
+    table.delete_item(
+        Key={
+            'giveaway_id': str(giveaway_id),
+            'user_id': str(user_id)
+        }
+    )
+    return "deleted"
+
+
+def end_giveaway(giveaway_id):
+    table = session.resource('dynamodb').Table(giveawaysTableName)
+    table.delete_item(Key={
+        'giveaway_id': str(giveaway_id)
+    })
+    scan_for_giveaways()
+    entries = get_all_entries(giveaway_id)
+    if len(entries) == 0:
+        return None
+    winner = random.randint(0, len(entries))
+    return entries[winner]
+
+
+def get_all_entries(giveaway_id):
+    entries_list = []
+    table = session.resource('dynamodb').Table(giveawayEntriesTableName)
+    response = table.scan(
+        FilterExpression=Key('giveaway_id').eq(str(giveaway_id))
+    )
+    for i in response['Items']:
+        entries_list.append(i['user_id'])
+    return entries_list
+
+
+def get_giveaway(giveaway_id):
+    return giveaways_cache.get(str(giveaway_id), None)
