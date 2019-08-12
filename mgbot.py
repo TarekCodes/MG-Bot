@@ -151,9 +151,9 @@ async def on_member_remove(member):
 async def on_raw_reaction_add(emoji, msg_id, channel_id, user_id):
     # handle giveaways
     if dynamo.get_giveaway(msg_id) is not None and emoji.name == "🏆" and user_id != 447970747076575232:
-        dynamo.new_giveaway_entry(user_id, msg_id)
-        await client.get_channel(channel_id).guild.get_member(user_id).send(
-            "You have been entered in the giveaway. Good luck!")
+        if dynamo.new_giveaway_entry(user_id, msg_id):
+            await client.get_channel(channel_id).guild.get_member(user_id).send(
+                "You have been entered in the giveaway. Good luck!")
     if msg_id in roles_msgs:
         guild = client.get_channel(channel_id).guild
         user = guild.get_member(user_id)

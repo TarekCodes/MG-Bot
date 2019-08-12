@@ -482,13 +482,13 @@ def new_giveaway_entry(user_id, giveaway_id):
     end_date = datetime.strptime(get_giveaway(giveaway_id), "%Y-%m-%d %H:%M:%S")
     date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
     if end_date < date:
-        return
+        return False
     table = session.resource('dynamodb').Table(giveawayEntriesTableName)
     table.put_item(Item={
         'giveaway_id': str(giveaway_id),
         'user_id': str(user_id)
     })
-    return giveaway_id
+    return True
 
 
 def delete_giveaway_entry(user_id, giveaway_id):
