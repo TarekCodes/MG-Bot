@@ -6,3 +6,4 @@
   3. Slow mode
   4. Message people who sign up for tournys to remind them about it and record their response.
   5. get most active members
+  6. clean up giveaway logic
