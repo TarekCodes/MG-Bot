@@ -3,7 +3,7 @@ from boto3.dynamodb.conditions import Key
 from datetime import datetime
 import random
 
-session = boto3.Session(profile_name='tarek')
+session = boto3.Session(profile_name='aatena')
 dynamodb = session.client('dynamodb')
 customTableName = 'mg_custom'
 suggestionsTableName = 'mg_suggestions'
