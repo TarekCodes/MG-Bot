@@ -189,7 +189,7 @@ async def on_ready():
     print(client.user.id)
     print('------')
     setup_emojis()
-    # await set_up_roles_msg()
+    await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
@@ -245,6 +245,8 @@ def setup_emojis():
     roleEmojis["⚔"] = "Hodor"
     roleEmojis["👷🏾"] = "Rainbow Six Siege"
     roleEmojis["😇"] = "Halo"
+    roleEmojis["🌠"] = "Stormtrooper"
+    roleEmojis["💳"] = "Tarnoobz"
 
     customRoleEmojis["chickenleg"] = 319229845957640192
     customRoleEmojis["runescape"] = 455087244898992129
@@ -252,6 +254,7 @@ def setup_emojis():
     roles_msgs.append(398539277035896846)
     roles_msgs.append(458465086693048341)
     roles_msgs.append(460218391781965824)
+    roles_msgs.append(633304992719306762)
 
 
 def has_power(message):
