@@ -438,6 +438,7 @@ def add_phrase(phrase, value):
                 'phrase': phrase,
             }
         )
+        scan_for_phrases()
         return "deleted"
     table.put_item(Item={
         'phrase': phrase,
@@ -456,6 +457,7 @@ def get_phrase(phrase):
 def scan_for_phrases():
     table = session.resource('dynamodb').Table(phraseTableName)
     response = table.scan()
+    phrase_cache.clear()
     for i in response['Items']:
         phrase_cache[i['phrase']] = i['value']
 
@@ -463,6 +465,7 @@ def scan_for_phrases():
 def scan_for_giveaways():
     table = session.resource('dynamodb').Table(giveawaysTableName)
     response = table.scan()
+    giveaways_cache.clear()
     for i in response['Items']:
         giveaways_cache[i['giveaway_id']] = i['end_date']
 

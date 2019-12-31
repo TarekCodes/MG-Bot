@@ -62,7 +62,7 @@ async def help(message):
     msg += "\n**$startgiveaway <period (#d or #h)> <prize> <true or false to mention everyone> " \
            "<channel for announcement> ** (starts a new giveaway, default channel is the current one)"
     msg += "\n**$endgiveaway <giveaway msg ID>** (returns a winner and ends the giveaway early if necessary)"
-    msg += "\n**phrase <\"phrase\"> <msg to be sent>** (creates/updates a custom msg when a phrase is sent)"
+    msg += "\n**$phrase <\"phrase\"> <msg to be sent>** (creates/updates a custom msg when a phrase is sent)"
 
     await message.channel.send(msg)
 

@@ -148,32 +148,33 @@ async def on_member_remove(member):
 
 
 @client.event
-async def on_raw_reaction_add(emoji, msg_id, channel_id, user_id):
+async def on_raw_reaction_add(payload):
     # handle giveaways
-    if dynamo.get_giveaway(msg_id) is not None and emoji.name == "🏆" and user_id != 447970747076575232:
-        if dynamo.new_giveaway_entry(user_id, msg_id):
-            await client.get_channel(channel_id).guild.get_member(user_id).send(
+    if dynamo.get_giveaway(
+            payload.message_id) is not None and payload.emoji.name == "🏆" and payload.user_id != 447970747076575232:
+        if dynamo.new_giveaway_entry(payload.user_id, payload.message_id):
+            await client.get_channel(payload.channel_id).guild.get_member(payload.user_id).send(
                 "You have been entered in the giveaway. Good luck!")
-    if msg_id in roles_msgs:
-        guild = client.get_channel(channel_id).guild
-        user = guild.get_member(user_id)
-        role_name = roleEmojis.get(emoji.name, None)
+    if payload.message_id in roles_msgs:
+        guild = client.get_channel(payload.channel_id).guild
+        user = guild.get_member(payload.user_id)
+        role_name = roleEmojis.get(payload.emoji.name, None)
         if role_name is not None:
             role = discord.utils.get(guild.roles, name=role_name)
             await user.add_roles(role, atomic=True)
 
 
 @client.event
-async def on_raw_reaction_remove(emoji, msg_id, channel_id, user_id):
+async def on_raw_reaction_remove(payload):
     # handle giveaways
-    if dynamo.get_giveaway(msg_id) is not None and emoji.name == "🏆":
-        dynamo.delete_giveaway_entry(user_id, msg_id)
-        await client.get_channel(channel_id).guild.get_member(user_id).send(
+    if dynamo.get_giveaway(payload.message_id) is not None and payload.emoji.name == "🏆":
+        dynamo.delete_giveaway_entry(payload.user_id, payload.message_id)
+        await client.get_channel(payload.channel_id).guild.get_member(payload.user_id).send(
             "Your entry has been removed.")
-    if msg_id in roles_msgs:
-        guild = client.get_channel(channel_id).guild
-        user = guild.get_member(user_id)
-        role_name = roleEmojis.get(emoji.name, None)
+    if payload.message_id in roles_msgs:
+        guild = client.get_channel(payload.channel_id).guild
+        user = guild.get_member(payload.user_id)
+        role_name = roleEmojis.get(payload.emoji.name, None)
         if role_name is not None:
             role = discord.utils.get(guild.roles, name=role_name)
             try:
@@ -196,7 +197,7 @@ async def set_up_roles_msg():
     rules_channel = client.get_channel(roles_chat)
     for emoji in roleEmojis:
         for current_msg in roles_msgs:
-            msg = await rules_channel.get_message(current_msg)
+            msg = await rules_channel.fetch_message(current_msg)
             try:
                 if emoji in customRoleEmojis:
                     await msg.add_reaction(client.get_emoji(customRoleEmojis.get(emoji)))
