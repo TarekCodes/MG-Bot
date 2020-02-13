@@ -16,6 +16,10 @@ roles_chat = 365624761398591489
 rules_chat = 458786996022673408
 bot_log = 245252349587619840
 bot_spam = 463874995169394698
+team_leads_role = 676618335059968001
+president_role = 192322577207787523
+advisory_role = 287369489987928075
+mods_role = 365541261156941829
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
@@ -262,7 +266,9 @@ def setup_emojis():
 def has_power(message):
     for command in modCommands:
         if message.content.startswith(
-                command) and message.author.top_role.id != 365541261156941829 and message.author.top_role.id != 287369489987928075 and message.author.top_role.id != 192322577207787523 and message.author.top_role.id != 193105896010809344 and message.author.top_role.id != 207996893769236481:
+                command) and message.author.top_role.id != president_role and \
+                message.author.top_role.id != team_leads_role and \
+                message.author.top_role.id != advisory_role and message.author.top_role.id != mods_role:
             return False
     return True
 
