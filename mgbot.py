@@ -20,6 +20,7 @@ team_leads_role = 676618335059968001
 president_role = 192322577207787523
 advisory_role = 287369489987928075
 mods_role = 365541261156941829
+admin_role = 193105896010809344
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
@@ -268,7 +269,8 @@ def has_power(message):
         if message.content.startswith(
                 command) and message.author.top_role.id != president_role and \
                 message.author.top_role.id != team_leads_role and \
-                message.author.top_role.id != advisory_role and message.author.top_role.id != mods_role:
+                message.author.top_role.id != advisory_role and message.author.top_role.id != mods_role and \
+                message.author.top_role.id != admin_role:
             return False
     return True
 
