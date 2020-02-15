@@ -21,6 +21,8 @@ president_role = 192322577207787523
 advisory_role = 287369489987928075
 mods_role = 365541261156941829
 admin_role = 193105896010809344
+infra_team_role = 674287256499912710
+infra_lead_role = 674291078760759317
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
@@ -270,7 +272,7 @@ def has_power(message):
                 command) and message.author.top_role.id != president_role and \
                 message.author.top_role.id != team_leads_role and \
                 message.author.top_role.id != advisory_role and message.author.top_role.id != mods_role and \
-                message.author.top_role.id != admin_role:
+                message.author.top_role.id != admin_role and message.author.top_role.id != infra_lead_role:
             return False
     return True
 
