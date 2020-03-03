@@ -85,7 +85,10 @@ async def server_mute(message):
     channels = message.guild.channels
     for user in mentions:
         for channel in channels:
-            await channel.set_permissions(user, overwrite=overwrite)
+            try:
+                await channel.set_permissions(user, overwrite=overwrite)
+            except Exception as e:
+                print(e)
         await message.channel.send("You're annoying " + user.mention)
     return
 
@@ -95,7 +98,10 @@ async def server_unmute(message):
     channels = message.guild.channels
     for user in mentions:
         for channel in channels:
-            await channel.set_permissions(user, overwrite=None)
+            try:
+                await channel.set_permissions(user, overwrite=None)
+            except Exception as e:
+                print(e)
         await message.channel.send("Better not do it again " + user.mention)
     return
 

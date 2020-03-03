@@ -19,10 +19,13 @@ bot_spam = 463874995169394698
 team_leads_role = 676618335059968001
 president_role = 192322577207787523
 advisory_role = 287369489987928075
+events_lead_role = 674291368088305664
 mods_role = 365541261156941829
 admin_role = 193105896010809344
 infra_team_role = 674287256499912710
 infra_lead_role = 674291078760759317
+afk_channel_id = 513411791116828692
+voice_role_id = 684253062143016971
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
@@ -191,6 +194,16 @@ async def on_raw_reaction_remove(payload):
 
 
 @client.event
+async def on_voice_state_update(member, before, after):
+    guild = member.guild
+    role = guild.get_role(voice_role_id)
+    if after.channel is not None and after.channel.id != afk_channel_id:
+        await member.add_roles(role, atomic=True)
+    else:
+        await member.remove_roles(role, atomic=True)
+
+
+@client.event
 async def on_ready():
     print('Logged in as')
     print(client.user.name)
@@ -271,7 +284,7 @@ def has_power(message):
         if message.content.startswith(
                 command) and message.author.top_role.id != president_role and \
                 message.author.top_role.id != team_leads_role and \
-                message.author.top_role.id != advisory_role and message.author.top_role.id != mods_role and \
+                message.author.top_role.id != events_lead_role and message.author.top_role.id != mods_role and \
                 message.author.top_role.id != admin_role and message.author.top_role.id != infra_lead_role:
             return False
     return True
