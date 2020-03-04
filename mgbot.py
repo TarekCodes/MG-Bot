@@ -4,6 +4,7 @@ import discord
 import moderation
 import miscellaneous as misc
 import reddit
+import eventlogging
 
 TOKEN = config.botToken
 roleEmojis = {}
@@ -204,13 +205,18 @@ async def on_voice_state_update(member, before, after):
 
 
 @client.event
+async def on_member_update(before, after):
+    await eventlogging.check_role_change(before, after, client)
+
+
+@client.event
 async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------')
     setup_emojis()
-    await set_up_roles_msg()
+    # await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
