@@ -171,6 +171,16 @@ async def on_member_unban(guild, user):
 
 
 @client.event
+async def on_guild_channel_create(channel):
+    await eventlogging.channel_create_log(channel, client)
+
+
+@client.event
+async def on_guild_channel_delete(channel):
+    await eventlogging.channel_delete_log(channel, client)
+
+
+@client.event
 async def on_raw_reaction_add(payload):
     # handle giveaways
     if dynamo.get_giveaway(

@@ -66,3 +66,21 @@ async def member_unban_log(user, client):
     embed.set_footer(text="ID: " + str(user.id))
     embed.set_thumbnail(url=user.avatar_url)
     await client.get_channel(bot_log).send(embed=embed)
+
+
+async def channel_create_log(channel, client):
+    embed = discord.Embed(
+        description="**Channel Created: #{}**".format(channel.name),
+        timestamp=datetime.datetime.utcnow(), color=discord.Color.green())
+    embed.set_author(name=channel.guild.name, icon_url=channel.guild.icon_url)
+    embed.set_footer(text="ID: " + str(channel.id))
+    await client.get_channel(bot_log).send(embed=embed)
+
+
+async def channel_delete_log(channel, client):
+    embed = discord.Embed(
+        description="**Channel Deleted: #{}**".format(channel.name),
+        timestamp=datetime.datetime.utcnow(), color=discord.Color.red())
+    embed.set_author(name=channel.guild.name, icon_url=channel.guild.icon_url)
+    embed.set_footer(text="ID: " + str(channel.id))
+    await client.get_channel(bot_log).send(embed=embed)
