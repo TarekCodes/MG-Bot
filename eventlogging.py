@@ -29,6 +29,26 @@ async def check_role_change(before, after, client):
         return
 
 
+async def check_nickname_change(before, after, client):
+    try:
+        if len(before.nick) == len(after.nick):
+            return
+    except Exception as e:
+        return
+    embed = discord.Embed(
+        description=after.mention + " **Nickname Changed**",
+        timestamp=datetime.datetime.utcnow(), color=discord.Color.blue())
+    embed.set_author(name="{}#{}".format(after.name, after.discriminator), icon_url=after.avatar_url)
+    embed.set_footer(text="ID: " + str(after.id))
+    embed.add_field(name="Before",
+                    value=before.nick,
+                    inline=False)
+    embed.add_field(name="After",
+                    value=after.nick,
+                    inline=False)
+    await client.get_channel(bot_log).send(embed=embed)
+
+
 async def member_join_log(member, client):
     embed = discord.Embed(
         description=member.mention + " {}#{}".format(member.name, member.discriminator),

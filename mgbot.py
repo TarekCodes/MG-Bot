@@ -140,6 +140,22 @@ async def on_message(message):
 
 
 @client.event
+async def on_voice_state_update(member, before, after):
+    guild = member.guild
+    role = guild.get_role(voice_role_id)
+    if after.channel is not None and after.channel.id != afk_channel_id:
+        await member.add_roles(role, atomic=True)
+    else:
+        await member.remove_roles(role, atomic=True)
+
+
+@client.event
+async def on_member_update(before, after):
+    await eventlogging.check_role_change(before, after, client)
+    await eventlogging.check_nickname_change(before, after, client)
+
+
+@client.event
 async def on_member_join(member):
     msg = "Assalamualaikum " + member.mention + "! Welcome to **Muslim Gamers**! Please take a moment to introduce "
     msg += "yourself! You may only chat here for the time being until you reach lvl 1.\n\n"
@@ -224,21 +240,6 @@ async def on_raw_reaction_remove(payload):
                 await user.remove_roles(role, atomic=True)
             except Exception as e:
                 print("couldn't remove role")
-
-
-@client.event
-async def on_voice_state_update(member, before, after):
-    guild = member.guild
-    role = guild.get_role(voice_role_id)
-    if after.channel is not None and after.channel.id != afk_channel_id:
-        await member.add_roles(role, atomic=True)
-    else:
-        await member.remove_roles(role, atomic=True)
-
-
-@client.event
-async def on_member_update(before, after):
-    await eventlogging.check_role_change(before, after, client)
 
 
 @client.event
