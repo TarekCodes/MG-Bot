@@ -181,6 +181,16 @@ async def on_guild_channel_delete(channel):
 
 
 @client.event
+async def on_guild_role_create(role):
+    await eventlogging.role_create_log(role, client)
+
+
+@client.event
+async def on_guild_role_delete(role):
+    await eventlogging.role_delete_log(role, client)
+
+
+@client.event
 async def on_raw_reaction_add(payload):
     # handle giveaways
     if dynamo.get_giveaway(

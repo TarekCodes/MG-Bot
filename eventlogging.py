@@ -3,6 +3,7 @@ import datetime
 
 bot_log = 245252349587619840
 voice_role_id = 684253062143016971
+color_url_prefix = "https://www.color-hex.com/color/"
 
 
 async def check_role_change(before, after, client):
@@ -84,3 +85,36 @@ async def channel_delete_log(channel, client):
     embed.set_author(name=channel.guild.name, icon_url=channel.guild.icon_url)
     embed.set_footer(text="ID: " + str(channel.id))
     await client.get_channel(bot_log).send(embed=embed)
+
+
+async def role_create_log(role, client):
+    embed = discord.Embed(description=":crossed_swords:** Role Created: {}**".format(role.name),
+                          timestamp=datetime.datetime.utcnow(), color=discord.Color.green())
+    embed.set_footer(text="ID: " + str(role.id))
+    embed.add_field(name="Permissions", value=get_perms(list(filter(filter_perms, iter(role.permissions)))))
+    await client.get_channel(bot_log).send(embed=embed)
+
+
+async def role_delete_log(role, client):
+    embed = discord.Embed(description=":wastebasket: ** Role Deleted: {}**".format(role.name),
+                          timestamp=datetime.datetime.utcnow(), color=discord.Color.red())
+    embed.set_footer(text="ID: " + str(role.id))
+    embed.add_field(name="Color",
+                    value="[{}]({}{})".format(str(role.color), color_url_prefix, str(role.color).replace("#", "")),
+                    inline=False)
+    embed.add_field(name="Permissions", value=get_perms(list(filter(filter_perms, iter(role.permissions)))))
+    await client.get_channel(bot_log).send(embed=embed)
+
+
+def filter_perms(perm):
+    return perm[1]
+
+
+def get_perms(perms):
+    perms_list = ""
+    for perm in perms:
+        if perms_list != "":
+            perms_list += ", "
+        perms_list += (perm[0])
+    perms_list = perms_list.replace("_", " ")
+    return perms_list
