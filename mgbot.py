@@ -150,12 +150,24 @@ async def on_member_join(member):
     msg += "Also check out " + client.get_channel(announcementsChat).mention
     msg += " for the latest things happening in the server.\n"
     await client.get_channel(welcomeChat).send(msg)
+    await eventlogging.member_join_log(member, client)
 
 
 @client.event
 async def on_member_remove(member):
     msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
     await client.get_channel(bot_spam).send(msg)
+    await eventlogging.member_leave_log(member, client)
+
+
+@client.event
+async def on_member_ban(guild, user):
+    await eventlogging.member_ban_log(user, client)
+
+
+@client.event
+async def on_member_unban(guild, user):
+    await eventlogging.member_unban_log(user, client)
 
 
 @client.event

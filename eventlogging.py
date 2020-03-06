@@ -26,3 +26,43 @@ async def check_role_change(before, after, client):
         await client.get_channel(bot_log).send(embed=embed)
     except Exception as e:
         return
+
+
+async def member_join_log(member, client):
+    embed = discord.Embed(
+        description=member.mention + " {}#{}".format(member.name, member.discriminator),
+        timestamp=datetime.datetime.utcnow(), color=discord.Color.green())
+    embed.set_author(name="Member Joined", icon_url=member.avatar_url)
+    embed.set_footer(text="ID: " + str(member.id))
+    embed.set_thumbnail(url=member.avatar_url)
+    await client.get_channel(bot_log).send(embed=embed)
+
+
+async def member_leave_log(member, client):
+    embed = discord.Embed(
+        description=member.mention + " {}#{}".format(member.name, member.discriminator),
+        timestamp=datetime.datetime.utcnow(), color=discord.Color.red())
+    embed.set_author(name="Member Left", icon_url=member.avatar_url)
+    embed.set_footer(text="ID: " + str(member.id))
+    embed.set_thumbnail(url=member.avatar_url)
+    await client.get_channel(bot_log).send(embed=embed)
+
+
+async def member_ban_log(user, client):
+    embed = discord.Embed(
+        description=user.mention + " {}#{}".format(user.name, user.discriminator),
+        timestamp=datetime.datetime.utcnow(), color=discord.Color.red())
+    embed.set_author(name="Member Banned", icon_url=user.avatar_url)
+    embed.set_footer(text="ID: " + str(user.id))
+    embed.set_thumbnail(url=user.avatar_url)
+    await client.get_channel(bot_log).send(embed=embed)
+
+
+async def member_unban_log(user, client):
+    embed = discord.Embed(
+        description=user.mention + " {}#{}".format(user.name, user.discriminator),
+        timestamp=datetime.datetime.utcnow(), color=discord.Color.blue())
+    embed.set_author(name="Member Unbanned", icon_url=user.avatar_url)
+    embed.set_footer(text="ID: " + str(user.id))
+    embed.set_thumbnail(url=user.avatar_url)
+    await client.get_channel(bot_log).send(embed=embed)
