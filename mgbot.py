@@ -33,7 +33,7 @@ modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", 
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
                "$getallcustom", "$phrase ", "$question"]
 
-initial_extensions = ['cogs.moderation']
+initial_extensions = ['cogs.moderation', 'cogs.misc']
 
 bot = commands.Bot(command_prefix='$', case_insensitive=False, description="MG Bot")
 for extension in initial_extensions:
@@ -51,9 +51,6 @@ async def on_message(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
-    if message.content.startswith('$custom '):
-        await misc.custom(message)
-        return
     if message.content.startswith('$question'):
         await misc.get_question(message)
         return
@@ -75,10 +72,6 @@ async def on_message(message):
     if message.content.startswith('$unbansuggestions '):
         await misc.unban_suggestions(message)
         return
-    if message.content.startswith('$'):
-        response = dynamo.get_custom_command(message.content[1:])
-        if response is not None:
-            await message.channel.send(response)
     if message.content == "$getallcustom":
         response = dynamo.get_all_custom()
         for msg in response:

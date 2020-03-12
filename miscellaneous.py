@@ -10,25 +10,6 @@ url = "https://opentdb.com/api.php?amount=1&type=multiple"
 throwdown = {"rock": "\u270A", "paper": "\u270B", "scissor": "\u270C"}
 
 
-async def custom(message):
-    try:
-        parsed = message.content.split()
-        if len(parsed) < 2:
-            raise Exception()
-        command = parsed[1]
-        value = ""
-        for part in parsed[2:]:
-            value += part + " "
-        if dynamo.add_custom_command(command, value) == "deleted":
-            await message.channel.send("Command deleted!")
-        else:
-            await message.channel.send("Mission Accomplished")
-    except Exception as e:
-        print(e)
-        await message.channel.send("Invalid Command")
-    return
-
-
 async def help(message):
     msg = "**$cone <@user1> <@user2> ...**"
     msg += "\n**$uncone <@user1> <@user2> ...**"
