@@ -4,33 +4,6 @@ deleteMessage = None
 muted_channels_overwrites = {}
 
 
-async def server_mute(message):
-    mentions = message.mentions
-    overwrite = discord.PermissionOverwrite()
-    overwrite.send_messages = False
-    overwrite.speak = False
-    channels = message.guild.channels
-    for user in mentions:
-        for channel in channels:
-            try:
-                await channel.set_permissions(user, overwrite=overwrite)
-            except Exception as e:
-                print(e)
-        await message.channel.send("You're annoying " + user.mention)
-    return
-
-
-async def server_unmute(message):
-    mentions = message.mentions
-    channels = message.guild.channels
-    for user in mentions:
-        for channel in channels:
-            try:
-                await channel.set_permissions(user, overwrite=None)
-            except Exception as e:
-                print(e)
-        await message.channel.send("Better not do it again " + user.mention)
-    return
 
 
 async def clear(message):

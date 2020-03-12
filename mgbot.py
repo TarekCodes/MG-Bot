@@ -52,12 +52,6 @@ async def on_message(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
-    if message.content.startswith('$mute '):
-        await moderation.mute(message)
-        return
-    if message.content.startswith('$unmute '):
-        await moderation.unmute(message)
-        return
     if message.content.startswith('$servermute '):
         await moderation.server_mute(message)
         return

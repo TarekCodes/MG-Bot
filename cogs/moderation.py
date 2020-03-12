@@ -62,6 +62,33 @@ class Moderation(commands.Cog):
             await ctx.channel.send(member.mention + " has been forgiven")
         return
 
+    @commands.command(name="servermute")
+    async def server_mute(self, ctx, members: commands.Greedy[discord.Member]):
+        overwrite = discord.PermissionOverwrite()
+        overwrite.send_messages = False
+        overwrite.speak = False
+        channels = ctx.guild.channels
+        for member in members:
+            for channel in channels:
+                try:
+                    await channel.set_permissions(member, overwrite=overwrite)
+                except Exception as e:
+                    print(e)
+            await ctx.channel.send("You're annoying " + member.mention)
+        return
+
+    @commands.command(name="serverunmute")
+    async def server_unmute(self, ctx, members: commands.Greedy[discord.Member]):
+        channels = ctx.guild.channels
+        for member in members:
+            for channel in channels:
+                try:
+                    await channel.set_permissions(member, overwrite=None)
+                except Exception as e:
+                    print(e)
+            await ctx.channel.send("Better not do it again " + member.mention)
+        return
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if self.is_coned(message.author.id):
