@@ -5,6 +5,8 @@ import moderation
 import miscellaneous as misc
 import reddit
 import eventlogging
+from discord.ext import commands
+from cogs.testcog import TestCog
 
 TOKEN = config.botToken
 roleEmojis = {}
@@ -32,32 +34,24 @@ modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", 
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
                "$getallcustom", "$phrase ", "$question"]
 
-client = discord.Client()
+initial_extensions = ['cogs.moderation']
+
+bot = commands.Bot(command_prefix='$', case_insensitive=False, description="MG Bot")
+for extension in initial_extensions:
+    bot.load_extension(extension)
 dynamo.init()
 
 
-@client.event
+# @bot.event
 async def on_message(message):
     if message.guild is None and message.content.lower().startswith('suggestion: '):
-        await misc.new_suggestion(message, client, suggestions_chat)
+        await misc.new_suggestion(message, bot, suggestions_chat)
         return
-
-    if moderation.is_coned(message.author.id):
-        await moderation.cone_message(message)
 
     if not has_power(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
-    if message.content.startswith('$uncone '):
-        await moderation.uncone(message)
-        return
-    if message.content.startswith('$cone '):
-        await moderation.cone(message)
-        return
-    if message.content.startswith('$coned'):
-        await moderation.get_coned(message)
-        return
     if message.content.startswith('$mute '):
         await moderation.mute(message)
         return
@@ -74,7 +68,7 @@ async def on_message(message):
         await moderation.clear(message)
         return
     if message.content.startswith('$invitelink'):
-        await misc.invite_link(message, client, welcomeChat)
+        await misc.invite_link(message, bot, welcomeChat)
         return
     if message.content.startswith('$custom '):
         await misc.custom(message)
@@ -118,10 +112,10 @@ async def on_message(message):
         await moderation.unmute_channel(message)
         return
     if message.content.startswith('$suggestions '):
-        await misc.get_suggestions(message, client, bot_log)
+        await misc.get_suggestions(message, bot, bot_log)
         return
     if message.content.startswith('$suggestion '):
-        await misc.get_suggestion(message, client, bot_log)
+        await misc.get_suggestion(message, bot, bot_log)
         return
     if message.content.startswith('$reddit '):
         await reddit.get_top_post(message)
@@ -130,16 +124,16 @@ async def on_message(message):
         await misc.start_giveaway(message)
         return
     if message.content.startswith('$endgiveaway '):
-        await misc.end_giveaway(client, message)
+        await misc.end_giveaway(bot, message)
         return
     # handle phrase
     val = dynamo.get_phrase(message.content)
-    if val is not None and message.author.id != client.user.id:
+    if val is not None and message.author.id != bot.user.id:
         await message.channel.send(val)
         return
 
 
-@client.event
+@bot.event
 async def on_voice_state_update(member, before, after):
     guild = member.guild
     role = guild.get_role(voice_role_id)
@@ -149,73 +143,73 @@ async def on_voice_state_update(member, before, after):
         await member.remove_roles(role, atomic=True)
 
 
-@client.event
+@bot.event
 async def on_member_update(before, after):
-    await eventlogging.check_role_change(before, after, client)
-    await eventlogging.check_nickname_change(before, after, client)
+    await eventlogging.check_role_change(before, after, bot)
+    await eventlogging.check_nickname_change(before, after, bot)
 
 
-@client.event
+@bot.event
 async def on_member_join(member):
     msg = "Assalamualaikum " + member.mention + "! Welcome to **Muslim Gamers**! Please take a moment to introduce "
     msg += "yourself! You may only chat here for the time being until you reach lvl 1.\n\n"
     msg += "**You gain lvls by chatting!** After reaching lvl 1 you will gain access to the rest of the chats.\n\n"
-    msg += "**Checkout the roles we have over at " + client.get_channel(roles_chat).mention + " and react "
+    msg += "**Checkout the roles we have over at " + bot.get_channel(roles_chat).mention + " and react "
     msg += "to the messages to give yourself the ones you like.**\n\n"
-    msg += "Feel free to read " + client.get_channel(rules_chat).mention + " and follow them accordingly.\n"
-    msg += "Also check out " + client.get_channel(announcementsChat).mention
+    msg += "Feel free to read " + bot.get_channel(rules_chat).mention + " and follow them accordingly.\n"
+    msg += "Also check out " + bot.get_channel(announcementsChat).mention
     msg += " for the latest things happening in the server.\n"
-    await client.get_channel(welcomeChat).send(msg)
-    await eventlogging.member_join_log(member, client)
+    await bot.get_channel(welcomeChat).send(msg)
+    await eventlogging.member_join_log(member, bot)
 
 
-@client.event
+@bot.event
 async def on_member_remove(member):
     msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
-    await client.get_channel(bot_spam).send(msg)
-    await eventlogging.member_leave_log(member, client)
+    await bot.get_channel(bot_spam).send(msg)
+    await eventlogging.member_leave_log(member, bot)
 
 
-@client.event
+@bot.event
 async def on_member_ban(guild, user):
-    await eventlogging.member_ban_log(user, client)
+    await eventlogging.member_ban_log(user, bot)
 
 
-@client.event
+@bot.event
 async def on_member_unban(guild, user):
-    await eventlogging.member_unban_log(user, client)
+    await eventlogging.member_unban_log(user, bot)
 
 
-@client.event
+@bot.event
 async def on_guild_channel_create(channel):
-    await eventlogging.channel_create_log(channel, client)
+    await eventlogging.channel_create_log(channel, bot)
 
 
-@client.event
+@bot.event
 async def on_guild_channel_delete(channel):
-    await eventlogging.channel_delete_log(channel, client)
+    await eventlogging.channel_delete_log(channel, bot)
 
 
-@client.event
+@bot.event
 async def on_guild_role_create(role):
-    await eventlogging.role_create_log(role, client)
+    await eventlogging.role_create_log(role, bot)
 
 
-@client.event
+@bot.event
 async def on_guild_role_delete(role):
-    await eventlogging.role_delete_log(role, client)
+    await eventlogging.role_delete_log(role, bot)
 
 
-@client.event
+@bot.event
 async def on_raw_reaction_add(payload):
     # handle giveaways
     if dynamo.get_giveaway(
             payload.message_id) is not None and payload.emoji.name == "🏆" and payload.user_id != 447970747076575232:
         if dynamo.new_giveaway_entry(payload.user_id, payload.message_id):
-            await client.get_channel(payload.channel_id).guild.get_member(payload.user_id).send(
+            await bot.get_channel(payload.channel_id).guild.get_member(payload.user_id).send(
                 "You have been entered in the giveaway. Good luck!")
     if payload.message_id in roles_msgs:
-        guild = client.get_channel(payload.channel_id).guild
+        guild = bot.get_channel(payload.channel_id).guild
         user = guild.get_member(payload.user_id)
         role_name = roleEmojis.get(payload.emoji.name, None)
         if role_name is not None:
@@ -223,15 +217,15 @@ async def on_raw_reaction_add(payload):
             await user.add_roles(role, atomic=True)
 
 
-@client.event
+@bot.event
 async def on_raw_reaction_remove(payload):
     # handle giveaways
     if dynamo.get_giveaway(payload.message_id) is not None and payload.emoji.name == "🏆":
         dynamo.delete_giveaway_entry(payload.user_id, payload.message_id)
-        await client.get_channel(payload.channel_id).guild.get_member(payload.user_id).send(
+        await bot.get_channel(payload.channel_id).guild.get_member(payload.user_id).send(
             "Your entry has been removed.")
     if payload.message_id in roles_msgs:
-        guild = client.get_channel(payload.channel_id).guild
+        guild = bot.get_channel(payload.channel_id).guild
         user = guild.get_member(payload.user_id)
         role_name = roleEmojis.get(payload.emoji.name, None)
         if role_name is not None:
@@ -242,24 +236,24 @@ async def on_raw_reaction_remove(payload):
                 print("couldn't remove role")
 
 
-@client.event
+@bot.event
 async def on_ready():
     print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print(bot.user.name)
+    print(bot.user.id)
     print('------')
     setup_emojis()
     # await set_up_roles_msg()
 
 
 async def set_up_roles_msg():
-    rules_channel = client.get_channel(roles_chat)
+    rules_channel = bot.get_channel(roles_chat)
     for emoji in roleEmojis:
         for current_msg in roles_msgs:
             msg = await rules_channel.fetch_message(current_msg)
             try:
                 if emoji in customRoleEmojis:
-                    await msg.add_reaction(client.get_emoji(customRoleEmojis.get(emoji)))
+                    await msg.add_reaction(bot.get_emoji(customRoleEmojis.get(emoji)))
                 else:
                     await msg.add_reaction(emoji)
                 break
@@ -330,4 +324,4 @@ def has_power(message):
     return True
 
 
-client.run(TOKEN)
+bot.run(TOKEN)
