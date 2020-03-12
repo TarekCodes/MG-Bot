@@ -51,9 +51,6 @@ async def on_message(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
-    if message.content.startswith('$invitelink'):
-        await misc.invite_link(message, bot, welcomeChat)
-        return
     if message.content.startswith('$custom '):
         await misc.custom(message)
         return

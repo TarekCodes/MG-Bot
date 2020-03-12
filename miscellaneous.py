@@ -10,13 +10,6 @@ url = "https://opentdb.com/api.php?amount=1&type=multiple"
 throwdown = {"rock": "\u270A", "paper": "\u270B", "scissor": "\u270C"}
 
 
-async def invite_link(message, client, welcome_chat):
-    invite = await client.get_channel(welcome_chat).create_invite(max_uses=1, max_age=1440,
-                                                                  reason="created by " + str(message.author))
-    await message.channel.send("New invite created for " + message.author.mention + " " + invite.url)
-    return
-
-
 async def custom(message):
     try:
         parsed = message.content.split()
