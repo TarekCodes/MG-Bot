@@ -6,16 +6,6 @@ muted_channels_overwrites = {}
 
 
 
-async def clear(message):
-    try:
-        parsed = message.content.split()
-        global deleteMessage
-        deleteMessage = message
-        deleted = await message.channel.purge(limit=int(parsed[1]), check=is_person)
-        await message.channel.send('Deleted {} message(s)'.format(len(deleted)))
-    except Exception as e:
-        await message.channel.send("Invalid Command")
-    return
 
 
 async def mute_channel(message):
@@ -42,11 +32,6 @@ async def unmute_channel(message):
     await message.channel.send("CHAT YOU FOOLS!")
 
 
-def is_person(m):
-    mentions = deleteMessage.mentions
-    if len(mentions) == 0:
-        return True
-    return m.author == deleteMessage.mentions[0]
 
 
 def is_mod(id):

@@ -19,7 +19,6 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(member.mention + " unconed")
             else:
                 await ctx.channel.send(member.mention + " wasn't coned")
-        return
 
     @commands.command()
     async def cone(self, ctx, members: commands.Greedy[discord.Member]):
@@ -33,7 +32,6 @@ class Moderation(commands.Cog):
             except discord.Forbidden:
                 print("Can't change nickname")
             await ctx.send("Shame on you! " + member.mention)
-        return
 
     @commands.command(name="coned")
     async def get_coned(self, message):
@@ -44,7 +42,6 @@ class Moderation(commands.Cog):
             await message.channel.send(msg)
         else:
             await message.channel.send("Currently none")
-        return
 
     @commands.command()
     async def mute(self, ctx, members: commands.Greedy[discord.Member]):
@@ -53,14 +50,12 @@ class Moderation(commands.Cog):
             overwrite.send_messages = False
             await ctx.channel.set_permissions(member, overwrite=overwrite)
             await ctx.channel.send(member.mention + " has been silenced")
-        return
 
     @commands.command()
     async def unmute(self, ctx, members: commands.Greedy[discord.Member]):
         for member in members:
             await ctx.channel.set_permissions(member, overwrite=None)
             await ctx.channel.send(member.mention + " has been forgiven")
-        return
 
     @commands.command(name="servermute")
     async def server_mute(self, ctx, members: commands.Greedy[discord.Member]):
@@ -75,7 +70,6 @@ class Moderation(commands.Cog):
                 except Exception as e:
                     print(e)
             await ctx.channel.send("You're annoying " + member.mention)
-        return
 
     @commands.command(name="serverunmute")
     async def server_unmute(self, ctx, members: commands.Greedy[discord.Member]):
@@ -87,7 +81,12 @@ class Moderation(commands.Cog):
                 except Exception as e:
                     print(e)
             await ctx.channel.send("Better not do it again " + member.mention)
-        return
+
+    @commands.command()
+    async def clear(self, ctx, num: int, *members: commands.Greedy[discord.Member]):
+        check = (lambda m: m.author in members) if members else None
+        deleted = await ctx.channel.purge(limit=num + 1, check=check)
+        await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)))
 
     @commands.Cog.listener()
     async def on_message(self, message):

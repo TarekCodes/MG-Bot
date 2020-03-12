@@ -6,7 +6,6 @@ import miscellaneous as misc
 import reddit
 import eventlogging
 from discord.ext import commands
-from cogs.testcog import TestCog
 
 TOKEN = config.botToken
 roleEmojis = {}
@@ -52,15 +51,6 @@ async def on_message(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
-    if message.content.startswith('$servermute '):
-        await moderation.server_mute(message)
-        return
-    if message.content.startswith('$serverunmute '):
-        await moderation.server_unmute(message)
-        return
-    if message.content.startswith('$clear '):
-        await moderation.clear(message)
-        return
     if message.content.startswith('$invitelink'):
         await misc.invite_link(message, bot, welcomeChat)
         return
