@@ -1,8 +1,10 @@
 import discord
 import dynamo
+import random
 from discord.ext import commands
 
 welcome_chat_id = 334014732572950528
+fight_hands = {"rock": "\u270A", "paper": "\u270B", "scissor": "\u270C"}
 
 
 class Misc(commands.Cog):
@@ -27,6 +29,15 @@ class Misc(commands.Cog):
         except Exception as e:
             print(e)
             await ctx.channel.send("Invalid Command")
+
+    @commands.command(name="fightme")
+    async def fight(self, ctx, members: commands.Greedy[discord.Member]):
+        author = ctx.author
+        for user in members:
+            hand, emoji = random.choice(list(fight_hands.items()))
+            await ctx.channel.send(user.mention + " played " + hand + " " + emoji)
+        hand, emoji = random.choice(list(fight_hands.items()))
+        await ctx.channel.send(author.mention + " played " + hand + " " + emoji)
 
     @commands.Cog.listener()
     async def on_message(self, message):
