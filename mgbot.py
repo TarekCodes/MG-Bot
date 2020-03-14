@@ -51,15 +51,6 @@ async def on_message(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
-    if message.content.startswith('$question'):
-        await misc.get_question(message)
-        return
-    if message.content.startswith('$answer '):
-        await misc.answer_question(message)
-        return
-    if message.content.startswith('$score'):
-        await misc.get_score(message)
-        return
     if message.content.startswith('$phrase '):
         await misc.new_phrase(message)
         return
