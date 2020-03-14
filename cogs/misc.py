@@ -44,12 +44,18 @@ class Misc(commands.Cog):
 
     @commands.command(name="fightme", help="simulates a rock-paper-scissors game between people to solve problems :D")
     async def fight(self, ctx, members: commands.Greedy[discord.Member]):
-        author = ctx.author
-        for user in members:
-            hand, emoji = random.choice(list(fight_hands.items()))
-            await ctx.channel.send(user.mention + " played " + hand + " " + emoji)
+        count = 1
         hand, emoji = random.choice(list(fight_hands.items()))
-        await ctx.channel.send(author.mention + " played " + hand + " " + emoji)
+        embed = discord.Embed(color=discord.Color.dark_red())
+        embed.set_author(name="NEW BATTLE!!", icon_url=ctx.guild.icon_url)
+        for user in members:
+            embed.add_field(name="Fighter #{}".format(count),
+                            value=user.mention + " played **" + hand + "** " + emoji, inline=False)
+            count += 1
+            hand, emoji = random.choice(list(fight_hands.items()))
+        embed.add_field(name="Fighter #{}".format(count),
+                        value=ctx.author.mention + " played **" + hand + "** " + emoji, inline=False)
+        await ctx.channel.send(embed=embed)
 
     @is_mod()
     @commands.command(name="question", help="sends a random trivia questions in the chat")
