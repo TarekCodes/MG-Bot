@@ -40,69 +40,6 @@ async def help(message):
     await message.channel.send(msg)
 
 
-async def new_suggestion(message, client, suggestions_chat):
-    date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
-    latest_sugg = dynamo.get_latest_suggestion(message)
-    if dynamo.is_suggestion_banned(message.author.id) is not None:
-        await message.author.send("You've been banned from making suggestions :(")
-        return
-    if latest_sugg is not None:
-        old_date = datetime.strptime(latest_sugg['date'], "%Y-%m-%d %H:%M:%S")
-        date_delta = abs(date - old_date)
-        if date_delta.days <= 0 and date_delta.seconds / 3600 < default_suggestion_wait:
-            await message.author.send(
-                "Too soon! You need to wait " + str(
-                    default_suggestion_wait * 60 - int(date_delta.seconds / 60)) + " minutes.")
-            return
-    msg = await client.get_channel(suggestions_chat).send(
-        "New Suggestion: " + message.content[message.content.find(' '):])
-    dynamo.add_new_suggestion(message, date, msg.id)
-    await message.author.send("Thanks for your suggestion!")
-    return
-
-
-async def get_suggestions(message, client, bot_log):
-    parsed = message.content.split()
-    msgs = []
-    try:
-        if len(parsed) < 2:
-            raise Exception()
-        suggestions = dynamo.get_all_suggestion(parsed[1])
-        print(parsed[1])
-        current = "```User: " + message.guild.get_member(int(parsed[1])).name + "```\n\n"
-        for item in suggestions:
-            addition = "```Date: " + item['date'] + "\n" + item['suggestions'].strip() + "```\n\n"
-            if len(current + addition) >= 2000:
-                msgs.append(current)
-                current = ""
-            current += addition
-        msgs.append(current)
-        for item in msgs:
-            await client.get_channel(bot_log).send(item)
-    except Exception as e:
-        print(str(e))
-        await message.channel.send("Invalid Command")
-
-
-async def get_suggestion(message, client, bot_log):
-    parsed = message.content.split()
-    try:
-        if len(parsed) < 2:
-            raise Exception()
-        suggestion_list = dynamo.get_suggestion(parsed[1])
-        if len(suggestion_list) == 0:
-            await client.get_channel(bot_log).send("Suggestion not found")
-            return
-        suggestion = suggestion_list[0]
-        message = "```User: " + message.guild.get_member(int(suggestion['user_id'])).name + "\n\n"
-        message += "Date: " + suggestion['date'] + "\n" + suggestion['suggestions'].strip() + "\n\n\n"
-        message += '```'
-        await client.get_channel(bot_log).send(message)
-    except Exception as e:
-        print(str(e))
-        await message.channel.send("Invalid Command")
-
-
 async def get_question(message):
     response = requests.get(url).json()
     question = decoder(response["results"][0]["question"])
@@ -145,30 +82,6 @@ async def get_score(message):
 def decoder(content):
     new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&amp;", "&")
     return new
-
-
-async def ban_suggestions(message):
-    parsed = message.content.split()
-    try:
-        if len(parsed) < 2:
-            raise Exception()
-        dynamo.new_suggestion_ban(parsed[1])
-        await message.channel.send("User banned from making suggestions")
-    except Exception as e:
-        print(str(e))
-        await message.channel.send("Invalid Command")
-
-
-async def unban_suggestions(message):
-    parsed = message.content.split()
-    try:
-        if len(parsed) < 2:
-            raise Exception()
-        dynamo.suggestion_unban(parsed[1])
-        await message.channel.send("User can make suggestions again")
-    except Exception as e:
-        print(str(e))
-        await message.channel.send("Invalid Command")
 
 
 async def new_phrase(message):

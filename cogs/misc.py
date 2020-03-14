@@ -10,7 +10,6 @@ fight_hands = {"rock": "\u270A", "paper": "\u270B", "scissor": "\u270C"}
 class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.coned = {}
 
     @commands.command(name="invitelink")
     async def invite_link(self, ctx):

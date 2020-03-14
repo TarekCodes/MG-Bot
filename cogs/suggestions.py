@@ -1,0 +1,90 @@
+import discord
+import dynamo
+import datetime
+from datetime import datetime, timedelta
+from discord.ext import commands
+from dateutil import parser
+
+botlog_chat_id = 245252349587619840
+suggestions_chat_id = 480459932164947969
+default_suggestion_wait = 1
+
+
+class Suggestions(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(name="bansuggestions")
+    async def ban_suggestions(self, ctx, member_id):
+        dynamo.new_suggestion_ban(member_id)
+        await ctx.channel.send("Member banned from making suggestions")
+
+    @commands.command(name="unbansuggestions")
+    async def unban_suggestions(self, ctx, member_id):
+        dynamo.suggestion_unban(member_id)
+        await ctx.channel.send("Member can make suggestions again")
+
+    @commands.command(name="suggestion")
+    async def get_suggestion(self, ctx, message_id):
+        suggestion_list = dynamo.get_suggestion(message_id)
+        if len(suggestion_list) == 0:
+            await ctx.guild.get_channel(botlog_chat_id).send("Suggestion not found")
+            return
+        suggestion = suggestion_list[0]
+        member = ctx.guild.get_member(int(suggestion['user_id']))
+        embed = discord.Embed(
+            description=suggestion['suggestions'].strip(),
+            timestamp=parser.parse(suggestion['date']), color=discord.Color.darker_grey())
+        embed.set_author(name=member.name, icon_url=member.avatar_url)
+        embed.set_footer(text="Suggestion ID: " + message_id)
+        embed.set_thumbnail(url=member.avatar_url)
+        await ctx.guild.get_channel(botlog_chat_id).send(embed=embed)
+
+    @commands.command(name="suggestions")
+    async def get_suggestions(self, ctx, user_id):
+        msgs = []
+        try:
+            suggestions = dynamo.get_all_suggestion(user_id)
+            current = "```User: " + ctx.guild.get_member(int(user_id)).name + "```\n\n"
+            for item in suggestions:
+                addition = "```Date: " + item['date'] + "\n" + item['suggestions'].strip() + "```\n\n"
+                if len(current + addition) >= 2000:
+                    msgs.append(current)
+                    current = ""
+                current += addition
+            msgs.append(current)
+            for item in msgs:
+                await ctx.guild.get_channel(botlog_chat_id).send(item)
+        except Exception as e:
+            print(str(e))
+            await ctx.channel.send("Invalid Command")
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.guild is None and message.content.lower().startswith('suggestion: '):
+            await self.new_suggestion(message)
+            return
+
+    async def new_suggestion(self, message):
+        date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
+        latest_sugg = dynamo.get_latest_suggestion(message)
+        if dynamo.is_suggestion_banned(message.author.id) is not None:
+            await message.author.send("You've been banned from making suggestions :(")
+            return
+        if latest_sugg is not None:
+            old_date = datetime.strptime(latest_sugg['date'], "%Y-%m-%d %H:%M:%S")
+            date_delta = abs(date - old_date)
+            if date_delta.days <= 0 and date_delta.seconds / 3600 < default_suggestion_wait:
+                await message.author.send(
+                    "Too soon! You need to wait " + str(
+                        default_suggestion_wait * 60 - int(date_delta.seconds / 60)) + " minutes.")
+                return
+        msg = await self.bot.get_channel(suggestions_chat_id).send(
+            "New Suggestion: " + message.content[message.content.find(' '):])
+        dynamo.add_new_suggestion(message, date, msg.id)
+        await message.author.send("Thanks for your suggestion!")
+        return
+
+
+def setup(bot):
+    bot.add_cog(Suggestions(bot))

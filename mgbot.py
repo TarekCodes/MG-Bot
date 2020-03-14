@@ -33,7 +33,7 @@ modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", 
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
                "$getallcustom", "$phrase ", "$question"]
 
-initial_extensions = ['cogs.moderation', 'cogs.misc']
+initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions']
 
 bot = commands.Bot(command_prefix='$', case_insensitive=False, description="MG Bot")
 for extension in initial_extensions:
@@ -63,12 +63,6 @@ async def on_message(message):
     if message.content.startswith('$phrase '):
         await misc.new_phrase(message)
         return
-    if message.content.startswith('$bansuggestions '):
-        await misc.ban_suggestions(message)
-        return
-    if message.content.startswith('$unbansuggestions '):
-        await misc.unban_suggestions(message)
-        return
     if message.content == "$getallcustom":
         response = dynamo.get_all_custom()
         for msg in response:
@@ -81,12 +75,6 @@ async def on_message(message):
         return
     if message.content == '$unmutechannel':
         await moderation.unmute_channel(message)
-        return
-    if message.content.startswith('$suggestions '):
-        await misc.get_suggestions(message, bot, bot_log)
-        return
-    if message.content.startswith('$suggestion '):
-        await misc.get_suggestion(message, bot, bot_log)
         return
     if message.content.startswith('$reddit '):
         await reddit.get_top_post(message)
