@@ -4,20 +4,14 @@ import discord
 import moderation
 import miscellaneous as misc
 import reddit
-import eventlogging
 from discord.ext import commands
 
 TOKEN = config.botToken
 roleEmojis = {}
 customRoleEmojis = {}
 roles_msgs = []
-welcomeChat = 334014732572950528
-announcementsChat = 349679027126272011
-suggestions_chat = 480459932164947969
 roles_chat = 365624761398591489
-rules_chat = 458786996022673408
 bot_log = 245252349587619840
-bot_spam = 463874995169394698
 team_leads_role = 676618335059968001
 president_role = 192322577207787523
 advisory_role = 287369489987928075
@@ -26,14 +20,12 @@ mods_role = 365541261156941829
 admin_role = 193105896010809344
 infra_team_role = 674287256499912710
 infra_lead_role = 674291078760759317
-afk_channel_id = 513411791116828692
-voice_role_id = 684253062143016971
 
 modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", "$custom ", "$servermute ",
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
                "$getallcustom", "$phrase ", "$question"]
 
-initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions']
+initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions', 'cogs.eventlogging']
 
 bot = commands.Bot(command_prefix='$', case_insensitive=False, description="MG Bot")
 for extension in initial_extensions:
@@ -43,18 +35,9 @@ dynamo.init()
 
 # @bot.event
 async def on_message(message):
-    if message.guild is None and message.content.lower().startswith('suggestion: '):
-        await misc.new_suggestion(message, bot, suggestions_chat)
-        return
-
     if not has_power(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
-
-    if message.content == "$getallcustom":
-        response = dynamo.get_all_custom()
-        for msg in response:
-            await message.channel.send(msg)
     if message.content == '$help':
         await misc.help(message)
         return
@@ -67,73 +50,6 @@ async def on_message(message):
     if message.content.startswith('$reddit '):
         await reddit.get_top_post(message)
         return
-
-
-@bot.event
-async def on_voice_state_update(member, before, after):
-    guild = member.guild
-    role = guild.get_role(voice_role_id)
-    if after.channel is not None and after.channel.id != afk_channel_id:
-        await member.add_roles(role, atomic=True)
-    else:
-        await member.remove_roles(role, atomic=True)
-
-
-@bot.event
-async def on_member_update(before, after):
-    await eventlogging.check_role_change(before, after, bot)
-    await eventlogging.check_nickname_change(before, after, bot)
-
-
-@bot.event
-async def on_member_join(member):
-    msg = "Assalamualaikum " + member.mention + "! Welcome to **Muslim Gamers**! Please take a moment to introduce "
-    msg += "yourself! You may only chat here for the time being until you reach lvl 1.\n\n"
-    msg += "**You gain lvls by chatting!** After reaching lvl 1 you will gain access to the rest of the chats.\n\n"
-    msg += "**Checkout the roles we have over at " + bot.get_channel(roles_chat).mention + " and react "
-    msg += "to the messages to give yourself the ones you like.**\n\n"
-    msg += "Feel free to read " + bot.get_channel(rules_chat).mention + " and follow them accordingly.\n"
-    msg += "Also check out " + bot.get_channel(announcementsChat).mention
-    msg += " for the latest things happening in the server.\n"
-    await bot.get_channel(welcomeChat).send(msg)
-    await eventlogging.member_join_log(member, bot)
-
-
-@bot.event
-async def on_member_remove(member):
-    msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
-    await bot.get_channel(bot_spam).send(msg)
-    await eventlogging.member_leave_log(member, bot)
-
-
-@bot.event
-async def on_member_ban(guild, user):
-    await eventlogging.member_ban_log(user, bot)
-
-
-@bot.event
-async def on_member_unban(guild, user):
-    await eventlogging.member_unban_log(user, bot)
-
-
-@bot.event
-async def on_guild_channel_create(channel):
-    await eventlogging.channel_create_log(channel, bot)
-
-
-@bot.event
-async def on_guild_channel_delete(channel):
-    await eventlogging.channel_delete_log(channel, bot)
-
-
-@bot.event
-async def on_guild_role_create(role):
-    await eventlogging.role_create_log(role, bot)
-
-
-@bot.event
-async def on_guild_role_delete(role):
-    await eventlogging.role_delete_log(role, bot)
 
 
 @bot.event

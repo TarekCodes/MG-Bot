@@ -33,6 +33,12 @@ class Misc(commands.Cog):
             print(e)
             await ctx.channel.send("Invalid Command")
 
+    @commands.command(name="getallcustom")
+    async def get_all_custom(self, ctx):
+        response = dynamo.get_all_custom()
+        for msg in response:
+            await ctx.channel.send(msg)
+
     @commands.command(name="fightme")
     async def fight(self, ctx, members: commands.Greedy[discord.Member]):
         author = ctx.author
