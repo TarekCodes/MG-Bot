@@ -356,9 +356,9 @@ def delete_question(question_id):
     return "deleted"
 
 
-def increment_score(message):
+def increment_score(author_id, guild_id):
     table = session.resource('dynamodb').Table(scoresTableName)
-    user_id = str(message.guild.id) + "_" + str(message.author.id)
+    user_id = str(guild_id) + "_" + str(author_id)
     try:
         response = table.get_item(
             Key={
@@ -379,9 +379,9 @@ def increment_score(message):
         return 1
 
 
-def get_score(message):
+def get_score(author_id, guild_id):
     table = session.resource('dynamodb').Table(scoresTableName)
-    user_id = str(message.guild.id) + "_" + str(message.author.id)
+    user_id = str(guild_id) + "_" + str(author_id)
     try:
         response = table.get_item(
             Key={
