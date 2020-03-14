@@ -43,14 +43,6 @@ async def on_message(message):
         return
 
 
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-
-
 def has_power(message):
     for command in modCommands:
         if message.content.startswith(

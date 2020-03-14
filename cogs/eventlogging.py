@@ -109,6 +109,13 @@ class EventLogging(commands.Cog):
                         value=self.get_perms(list(filter(self.filter_perms, iter(role.permissions)))))
         await self.bot.get_channel(bot_log).send(embed=embed)
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print('Logged in as')
+        print(self.bot.user.name)
+        print(self.bot.user.id)
+        print('------')
+
     async def check_role_change(self, before, after):
         if len(before.roles) == len(after.roles):
             return
