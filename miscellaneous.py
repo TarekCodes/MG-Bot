@@ -1,6 +1,3 @@
-import dynamo
-
-
 async def help(message):
     msg = "**$cone <@user1> <@user2> ...**"
     msg += "\n**$uncone <@user1> <@user2> ...**"
@@ -32,18 +29,3 @@ async def help(message):
     await message.channel.send(msg)
 
 
-async def new_phrase(message):
-    try:
-        message_content = message.content
-        start = message_content.find("\"")
-        end = message_content.find("\"", start + 1)
-        value = message_content[end + 1:]
-        phrase = message_content[start + 1:end]
-        if dynamo.add_phrase(phrase, value) == "deleted":
-            await message.channel.send("Phrase deleted!")
-        else:
-            await message.channel.send("Mission Accomplished")
-    except Exception as e:
-        print(e)
-        await message.channel.send("Invalid Command")
-    return

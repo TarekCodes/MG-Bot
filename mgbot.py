@@ -51,9 +51,6 @@ async def on_message(message):
         await message.channel.send("YOU DON'T GOT THE POWER!")
         return
 
-    if message.content.startswith('$phrase '):
-        await misc.new_phrase(message)
-        return
     if message.content == "$getallcustom":
         response = dynamo.get_all_custom()
         for msg in response:
@@ -69,11 +66,6 @@ async def on_message(message):
         return
     if message.content.startswith('$reddit '):
         await reddit.get_top_post(message)
-        return
-    # handle phrase
-    val = dynamo.get_phrase(message.content)
-    if val is not None and message.author.id != bot.user.id:
-        await message.channel.send(val)
         return
 
 

@@ -103,17 +103,29 @@ class Misc(commands.Cog):
             return
         await ctx.channel.send("The winner is..." + ctx.guild.get_member(int(winner)).mention + "!!!!! Congrats!")
 
+    @commands.command(name="phrase")
+    async def new_phrase(self, ctx, phrase, *value):
+        value = " ".join(value)
+        if dynamo.add_phrase(phrase, value) == "deleted":
+            await ctx.channel.send("Phrase deleted!")
+        else:
+            await ctx.channel.send("Mission Accomplished")
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.content.startswith('$'):
             response = dynamo.get_custom_command(message.content[1:])
             if response is not None:
                 await message.channel.send(response)
+        val = dynamo.get_phrase(message.content)
+        if val is not None and message.author.id != self.bot.user.id:
+            await message.channel.send(val)
+            return
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if dynamo.get_giveaway(
-                payload.message_id) is not None and payload.emoji.name == "🏆" and payload.user_id != 447970747076575232:
+                payload.message_id) is not None and payload.emoji.name == "🏆" and payload.user_id != self.bot.user.id:
             if dynamo.new_giveaway_entry(payload.user_id, payload.message_id):
                 await payload.member.send(
                     "You have been entered in the giveaway. Good luck!")
