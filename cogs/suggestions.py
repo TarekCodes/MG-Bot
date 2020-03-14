@@ -4,6 +4,7 @@ import datetime
 from datetime import datetime, timedelta
 from discord.ext import commands
 from dateutil import parser
+from .moderation import is_mod
 
 botlog_chat_id = 245252349587619840
 suggestions_chat_id = 480459932164947969
@@ -14,16 +15,19 @@ class Suggestions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @is_mod()
     @commands.command(name="bansuggestions")
     async def ban_suggestions(self, ctx, member_id):
         dynamo.new_suggestion_ban(member_id)
         await ctx.channel.send("Member banned from making suggestions")
 
+    @is_mod()
     @commands.command(name="unbansuggestions")
     async def unban_suggestions(self, ctx, member_id):
         dynamo.suggestion_unban(member_id)
         await ctx.channel.send("Member can make suggestions again")
 
+    @is_mod()
     @commands.command(name="suggestion")
     async def get_suggestion(self, ctx, message_id):
         suggestion_list = dynamo.get_suggestion(message_id)
@@ -40,6 +44,7 @@ class Suggestions(commands.Cog):
         embed.set_thumbnail(url=member.avatar_url)
         await ctx.guild.get_channel(botlog_chat_id).send(embed=embed)
 
+    @is_mod()
     @commands.command(name="suggestions")
     async def get_suggestions(self, ctx, user_id):
         msgs = []

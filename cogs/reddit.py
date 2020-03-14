@@ -2,6 +2,7 @@ from discord.ext import commands
 import praw
 import config
 import requests
+from .moderation import is_mod
 
 
 class Reddit(commands.Cog):
@@ -9,6 +10,7 @@ class Reddit(commands.Cog):
         self.bot = bot
 
     @commands.command(name="reddit")
+    @is_mod()
     async def get_top_post(self, ctx, subreddit, *args):
         try:
             reddit = self.init_reddit()
@@ -27,7 +29,7 @@ class Reddit(commands.Cog):
         if len(post.selftext) > 5:
             await ctx.channel.send(post_link)
             return
-        post_json = requests.get(url=post_link[:-1] + ".json", headers={'User-agent': config.clienetID}).json()
+        post_json = requests.get(url=post_link[:-1] + ".json", headers={'User-agent': config.clientID}).json()
         if post.is_video:
             await ctx.channel.send(
                 post_json[0]["data"]["children"][0]["data"]["media"]["reddit_video"]["fallback_url"])
