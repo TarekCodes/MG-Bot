@@ -1,16 +1,10 @@
 import config
 import dynamo
-import discord
 import moderation
 import miscellaneous as misc
 from discord.ext import commands
 
 TOKEN = config.botToken
-roleEmojis = {}
-customRoleEmojis = {}
-roles_msgs = []
-roles_chat = 365624761398591489
-bot_log = 245252349587619840
 team_leads_role = 676618335059968001
 president_role = 192322577207787523
 advisory_role = 287369489987928075
@@ -24,7 +18,8 @@ modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", 
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
                "$getallcustom", "$phrase ", "$question"]
 
-initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions', 'cogs.eventlogging', 'cogs.reddit']
+initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions', 'cogs.eventlogging', 'cogs.reddit',
+                      'cogs.autoroles']
 
 bot = commands.Bot(command_prefix='$', case_insensitive=False, description="MG Bot")
 for extension in initial_extensions:
@@ -49,105 +44,11 @@ async def on_message(message):
 
 
 @bot.event
-async def on_raw_reaction_add(payload):
-    if payload.message_id in roles_msgs:
-        guild = bot.get_channel(payload.channel_id).guild
-        user = guild.get_member(payload.user_id)
-        role_name = roleEmojis.get(payload.emoji.name, None)
-        if role_name is not None:
-            role = discord.utils.get(guild.roles, name=role_name)
-            await user.add_roles(role, atomic=True)
-
-
-@bot.event
-async def on_raw_reaction_remove(payload):
-    if payload.message_id in roles_msgs:
-        guild = bot.get_channel(payload.channel_id).guild
-        user = guild.get_member(payload.user_id)
-        role_name = roleEmojis.get(payload.emoji.name, None)
-        if role_name is not None:
-            role = discord.utils.get(guild.roles, name=role_name)
-            try:
-                await user.remove_roles(role, atomic=True)
-            except Exception as e:
-                print("couldn't remove role")
-
-
-@bot.event
 async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    setup_emojis()
-    # await set_up_roles_msg()
-
-
-async def set_up_roles_msg():
-    rules_channel = bot.get_channel(roles_chat)
-    for emoji in roleEmojis:
-        for current_msg in roles_msgs:
-            msg = await rules_channel.fetch_message(current_msg)
-            try:
-                if emoji in customRoleEmojis:
-                    await msg.add_reaction(bot.get_emoji(customRoleEmojis.get(emoji)))
-                else:
-                    await msg.add_reaction(emoji)
-                break
-            except Exception as e:
-                print('next msg')
-
-
-def setup_emojis():
-    roleEmojis["🃏"] = "Road Blockers"
-    roleEmojis["chickenleg"] = "PUBG Crew"
-    roleEmojis["🐉"] = "League of Losers"
-    roleEmojis["🏹"] = "Hanzo Mains"
-    roleEmojis["🔫"] = "Rush B Watch Cat"
-    roleEmojis["💀"] = "Dead by Daylight"
-    roleEmojis["⚛"] = "Ancient Defenders"
-    roleEmojis["⚽"] = "Learning to Dribble"
-    roleEmojis["💠"] = "Guardians"
-    roleEmojis["🛠"] = "Master Builders"
-    roleEmojis["🐛"] = "Stick Fightin"
-    roleEmojis["⛳"] = "Mini Golf Rules"
-    roleEmojis["🌈"] = "Fuzing Hostage"
-    roleEmojis["🎵"] = "music haramis"
-    roleEmojis["runescape"] = "Osbuddies"
-    roleEmojis["⚔"] = "Dauntless"
-    roleEmojis["💸"] = "Cheap Gamers"
-    roleEmojis["🗺"] = "Skribblio"
-    roleEmojis["🔷"] = "Paladins"
-    roleEmojis["🤺"] = "For Honor"
-    roleEmojis["🎣"] = "World of Warcraft"
-    roleEmojis["🎇"] = "StarCraft"
-    roleEmojis["🕋"] = "Lecture"
-    roleEmojis["🤖"] = "TennoFrame"
-    roleEmojis["🐊"] = "Monster Hunters"
-    roleEmojis["🔄"] = "Nintendo Switch"
-    roleEmojis["🤠"] = "The Steves"
-    roleEmojis["⛓"] = "Sirat-ul-Exile"
-    roleEmojis["🔰"] = "Keyboard Warriors"
-    roleEmojis["🐸"] = "Fascist Scum"
-    roleEmojis["🏳"] = "Farm Simulator"
-    roleEmojis["👊🏾"] = "Button Mashers"
-    roleEmojis["🎮"] = "Apex Legends"
-    roleEmojis["🇱"] = "League of Losers EU"
-    roleEmojis["⚔"] = "Hodor"
-    roleEmojis["👷🏾"] = "Rainbow Six Siege"
-    roleEmojis["😇"] = "Halo"
-    roleEmojis["🌠"] = "Stormtrooper"
-    roleEmojis["💳"] = "Tarnoobz"
-    roleEmojis["⚠"] = "Going Dark"
-    roleEmojis["🍿"] = "Coke and Popcorn"
-
-    customRoleEmojis["chickenleg"] = 319229845957640192
-    customRoleEmojis["runescape"] = 455087244898992129
-
-    roles_msgs.append(398539277035896846)
-    roles_msgs.append(458465086693048341)
-    roles_msgs.append(460218391781965824)
-    roles_msgs.append(633304992719306762)
 
 
 def has_power(message):
