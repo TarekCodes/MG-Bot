@@ -1,11 +1,4 @@
-import discord
-import datetime
-from datetime import datetime, timedelta
 import dynamo
-import requests
-import random
-
-default_suggestion_wait = 1
 
 
 async def help(message):
@@ -54,52 +47,3 @@ async def new_phrase(message):
         print(e)
         await message.channel.send("Invalid Command")
     return
-
-
-async def start_giveaway(message):
-    try:
-        parsed = message.content.split()
-        channel_mention = message.channel
-        if len(message.channel_mentions) >= 1:
-            channel_mention = message.channel_mentions[0]
-        period = parsed[1]
-        prize = parsed[2]
-        mention_everyone = parsed[3]
-        mention = ""
-        if mention_everyone.lower() != "true" and mention_everyone.lower() != "false":
-            print(mention_everyone.lower())
-            raise Exception("not equal")
-        period_unit = period[-1]
-        if period_unit.lower() == "d":
-            end_date = (datetime.now() + timedelta(days=int(period[:-1]))).strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            if period_unit.lower() == "h":
-                end_date = (datetime.now() + timedelta(hours=int(period[:-1]))).strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                raise Exception()
-        if mention_everyone == "true":
-            mention = " @everyone"
-        announcement_message = await channel_mention.send(
-            "New giveaway! The prize is " + prize + " and it expires " + end_date + ". React to this message with 🏆 to enter!" + mention)
-        await announcement_message.add_reaction("🏆")
-        dynamo.new_giveaway(announcement_message.id, end_date, prize)
-    except Exception as e:
-        print(e)
-        await message.channel.send("Invalid Command")
-
-
-async def end_giveaway(client, message):
-    try:
-        parsed = message.content.split()
-        giveaway_id = parsed[1]
-        if dynamo.get_giveaway(giveaway_id) is None:
-            await message.channel.send("Giveaway doesn't exist!")
-            return
-        winner = dynamo.end_giveaway(giveaway_id)
-        if winner is None:
-            await message.channel.send("No one won. Booooooooo!")
-            return
-        await message.channel.send("The winner is..." + client.get_user(int(winner)).mention + "!!!!! Congrats!")
-    except Exception as e:
-        print(e)
-        await message.channel.send("Invalid Command")
