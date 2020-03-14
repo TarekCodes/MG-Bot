@@ -16,19 +16,19 @@ class Suggestions(commands.Cog):
         self.bot = bot
 
     @is_mod()
-    @commands.command(name="bansuggestions")
+    @commands.command(name="bansuggestions", help="ban user from making suggestions")
     async def ban_suggestions(self, ctx, member_id):
         dynamo.new_suggestion_ban(member_id)
         await ctx.channel.send("Member banned from making suggestions")
 
     @is_mod()
-    @commands.command(name="unbansuggestions")
+    @commands.command(name="unbansuggestions", help="unban user from making suggestions")
     async def unban_suggestions(self, ctx, member_id):
         dynamo.suggestion_unban(member_id)
         await ctx.channel.send("Member can make suggestions again")
 
     @is_mod()
-    @commands.command(name="suggestion")
+    @commands.command(name="suggestion", help="prints suggestion info in #bot_log")
     async def get_suggestion(self, ctx, message_id):
         suggestion_list = dynamo.get_suggestion(message_id)
         if len(suggestion_list) == 0:
@@ -45,7 +45,7 @@ class Suggestions(commands.Cog):
         await ctx.guild.get_channel(botlog_chat_id).send(embed=embed)
 
     @is_mod()
-    @commands.command(name="suggestions")
+    @commands.command(name="suggestions", help="prints all suggestions by specified user in #bot_log")
     async def get_suggestions(self, ctx, user_id):
         msgs = []
         try:

@@ -29,7 +29,7 @@ class Moderation(commands.Cog):
         self.coned = {}
 
     @is_mod()
-    @commands.command()
+    @commands.command(help="uncone users")
     async def uncone(self, ctx, members: commands.Greedy[discord.Member]):
         for member in members:
             if member.id in self.coned:
@@ -43,7 +43,7 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(member.mention + " wasn't coned")
 
     @is_mod()
-    @commands.command()
+    @commands.command(help="cone users")
     async def cone(self, ctx, members: commands.Greedy[discord.Member]):
         for member in members:
             if member.nick is None:
@@ -57,7 +57,7 @@ class Moderation(commands.Cog):
             await ctx.send("Shame on you! " + member.mention)
 
     @is_mod()
-    @commands.command(name="coned")
+    @commands.command(name="coned", help="get all coned users")
     async def get_coned(self, message):
         msg = ""
         for member in self.coned:
@@ -68,7 +68,7 @@ class Moderation(commands.Cog):
             await message.channel.send("Currently none")
 
     @is_mod()
-    @commands.command()
+    @commands.command(help="mute user in current channel")
     async def mute(self, ctx, members: commands.Greedy[discord.Member]):
         for member in members:
             overwrite = discord.PermissionOverwrite()
@@ -77,14 +77,14 @@ class Moderation(commands.Cog):
             await ctx.channel.send(member.mention + " has been silenced")
 
     @is_mod()
-    @commands.command()
+    @commands.command(help="unmute user in current channel")
     async def unmute(self, ctx, members: commands.Greedy[discord.Member]):
         for member in members:
             await ctx.channel.set_permissions(member, overwrite=None)
             await ctx.channel.send(member.mention + " has been forgiven")
 
     @is_mod()
-    @commands.command(name="servermute")
+    @commands.command(name="servermute", help="server-wide mute")
     async def server_mute(self, ctx, members: commands.Greedy[discord.Member]):
         overwrite = discord.PermissionOverwrite()
         overwrite.send_messages = False
@@ -99,7 +99,7 @@ class Moderation(commands.Cog):
             await ctx.channel.send("You're annoying " + member.mention)
 
     @is_mod()
-    @commands.command(name="serverunmute")
+    @commands.command(name="serverunmute", help="server-wide unmute")
     async def server_unmute(self, ctx, members: commands.Greedy[discord.Member]):
         channels = ctx.guild.channels
         for member in members:
@@ -111,14 +111,14 @@ class Moderation(commands.Cog):
             await ctx.channel.send("Better not do it again " + member.mention)
 
     @is_mod()
-    @commands.command()
+    @commands.command(help="optionally specify a user to only target him/her")
     async def clear(self, ctx, num: int, *members: commands.Greedy[discord.Member]):
         check = (lambda m: m.author in members) if members else None
         deleted = await ctx.channel.purge(limit=num + 1, check=check)
         await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)))
 
     @is_mod()
-    @commands.command(name="mutechannel")
+    @commands.command(name="mutechannel", help="mutes everyone except for mods")
     async def mute_channel(self, ctx):
         channel = ctx.channel
         overwrites = channel.overwrites
@@ -131,7 +131,7 @@ class Moderation(commands.Cog):
         await ctx.channel.send("YOU SHALL NOT CHAT!")
 
     @is_mod()
-    @commands.command(name="unmutechannel")
+    @commands.command(name="unmutechannel", help="brings the channel back to how it was")
     async def unmute_channel(self, ctx):
         channel = ctx.channel
         if channel.name not in muted_channels_overwrites:

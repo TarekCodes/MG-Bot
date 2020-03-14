@@ -16,14 +16,14 @@ class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="invitelink")
+    @commands.command(name="invitelink", help="Prints a single use invite that expires after 24hrs")
     async def invite_link(self, ctx):
         invite = await ctx.guild.get_channel(welcome_chat_id).create_invite(max_uses=1, max_age=1440,
                                                                             reason="created by " + str(ctx.author))
         await ctx.channel.send("New invite created for " + ctx.author.mention + " " + invite.url)
 
     @is_mod()
-    @commands.command()
+    @commands.command(help="creates/updates a custom command")
     async def custom(self, ctx, command, *value):
         try:
             value = " ".join(value)
@@ -36,13 +36,13 @@ class Misc(commands.Cog):
             await ctx.channel.send("Invalid Command")
 
     @is_mod()
-    @commands.command(name="getallcustom")
+    @commands.command(name="getallcustom", help="prints all custom commands currently configured")
     async def get_all_custom(self, ctx):
         response = dynamo.get_all_custom()
         for msg in response:
             await ctx.channel.send(msg)
 
-    @commands.command(name="fightme")
+    @commands.command(name="fightme", help="simulates a rock-paper-scissors game between people to solve problems :D")
     async def fight(self, ctx, members: commands.Greedy[discord.Member]):
         author = ctx.author
         for user in members:
@@ -52,7 +52,7 @@ class Misc(commands.Cog):
         await ctx.channel.send(author.mention + " played " + hand + " " + emoji)
 
     @is_mod()
-    @commands.command(name="question")
+    @commands.command(name="question", help="sends a random trivia questions in the chat")
     async def get_question(self, ctx):
         response = requests.get(questions_url).json()
         question = self.decoder(response["results"][0]["question"])
@@ -60,7 +60,7 @@ class Misc(commands.Cog):
         question_id = dynamo.new_question(question, answer)
         await ctx.channel.send("Question #" + str(question_id) + ": " + question)
 
-    @commands.command(name="answer")
+    @commands.command(name="answer", help="answers a trivia question by providing the question number and answer")
     async def answer_question(self, ctx, question_id, *value):
         try:
             answer = " ".join(value)
@@ -80,12 +80,12 @@ class Misc(commands.Cog):
             print(e)
             await ctx.channel.send("Invalid command.")
 
-    @commands.command(name="score")
+    @commands.command(name="score", help="gets your current trivia score")
     async def get_score(self, ctx):
         await ctx.channel.send("Your current score is: " + str(dynamo.get_score(ctx.author.id, ctx.guild.id)))
 
     @is_mod()
-    @commands.command(name="startgiveaway")
+    @commands.command(name="startgiveaway", help="starts a new giveaway, default channel is the current one")
     async def start_giveaway(self, ctx, period, prize, mention_everyone: bool, channel_mention: discord.TextChannel):
         mention = ""
         period_unit = period[-1]
@@ -104,7 +104,7 @@ class Misc(commands.Cog):
         dynamo.new_giveaway(announcement_message.id, end_date, prize)
 
     @is_mod()
-    @commands.command(name="endgiveaway")
+    @commands.command(name="endgiveaway", help="returns a winner and ends the giveaway early if necessary")
     async def end_giveaway(self, ctx, giveaway_id):
         if dynamo.get_giveaway(giveaway_id) is None:
             await ctx.channel.send("Giveaway doesn't exist!")
@@ -116,43 +116,13 @@ class Misc(commands.Cog):
         await ctx.channel.send("The winner is..." + ctx.guild.get_member(int(winner)).mention + "!!!!! Congrats!")
 
     @is_mod()
-    @commands.command(name="phrase")
+    @commands.command(name="phrase", help="creates/updates a custom msg when a phrase is sent")
     async def new_phrase(self, ctx, phrase, *value):
         value = " ".join(value)
         if dynamo.add_phrase(phrase, value) == "deleted":
             await ctx.channel.send("Phrase deleted!")
         else:
             await ctx.channel.send("Mission Accomplished")
-
-    async def help(self, ctx):
-        msg = "**$cone <@user1> <@user2> ...**"
-        msg += "\n**$uncone <@user1> <@user2> ...**"
-        msg += "\n**$mute <@user1> <@user2> ...**"
-        msg += "\n**$unmute <@user1> <@user2> ...**"
-        msg += "\n**$servermute <@user1> <@user2> ...** (server-wide mute)"
-        msg += "\n**$serverunmute <@user1> <@user2> ...** (server-wide unmute)"
-        msg += "\n**$clear <#> <@user>** (optionally specify a user to only target him/her)"
-        msg += "\n**$invitelink** (Prints a single use invite that expires after 24hrs)"
-        msg += "\n**$custom <command> <msg to be sent>** (creates/updates a custom command)"
-        msg += "\n**$custom <command>** (deletes an existing command)"
-        msg += "\n**$getallcustom** (prints all custom commands currently configured)"
-        msg += "\n**$mutechannel** (mutes everyone except for mods)"
-        msg += "\n**$unmutechannel** (brings the channel back to how it was)"
-        msg += "\n**$suggestion <msg_id>** (prints suggestion info in #bot_log)"
-        msg += "\n**$suggestions <user_id>** (prints all suggestions by specified user in #bot_log)"
-        msg += "\n**$reddit <sub-reddit> <period> <#>** (gets top post or whatever number if period is specified)"
-        msg += "\n**$bansuggestions <user_id>** (ban user from making suggestions)"
-        msg += "\n**$unbansuggestions <user_id>** (unban user from making suggestions)"
-        msg += "\n**$question** (sends a random trivia questions in the chat)"
-        msg += "\n**$answer <question #> <answer>** (answers a trivia question by providing the question number and answer)"
-        msg += "\n**$score** (gets your current trivia score)"
-        msg += "\n**$fightme <@user>** (simulates a rock-paper-scissors game between 2 people to solve problems :D)"
-        msg += "\n**$startgiveaway <period (#d or #h)> <prize> <true or false to mention everyone> " \
-               "<channel for announcement> ** (starts a new giveaway, default channel is the current one)"
-        msg += "\n**$endgiveaway <giveaway msg ID>** (returns a winner and ends the giveaway early if necessary)"
-        msg += "\n**$phrase <\"phrase\"> <msg to be sent>** (creates/updates a custom msg when a phrase is sent)"
-
-        await ctx.channel.send(msg)
 
     @commands.Cog.listener()
     async def on_message(self, message):
