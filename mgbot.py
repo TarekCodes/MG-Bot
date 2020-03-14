@@ -3,7 +3,6 @@ import dynamo
 import discord
 import moderation
 import miscellaneous as misc
-import reddit
 from discord.ext import commands
 
 TOKEN = config.botToken
@@ -25,7 +24,7 @@ modCommands = ["$uncone ", "$cone ", "$coned", "$mute ", "$unmute ", "$clear ", 
                "$serverunmute ", "$help", "$mutechannel", "$unmutechannel", "$suggestions ", "$suggestion ", "$reddit ",
                "$getallcustom", "$phrase ", "$question"]
 
-initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions', 'cogs.eventlogging']
+initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions', 'cogs.eventlogging', 'cogs.reddit']
 
 bot = commands.Bot(command_prefix='$', case_insensitive=False, description="MG Bot")
 for extension in initial_extensions:
@@ -46,9 +45,6 @@ async def on_message(message):
         return
     if message.content == '$unmutechannel':
         await moderation.unmute_channel(message)
-        return
-    if message.content.startswith('$reddit '):
-        await reddit.get_top_post(message)
         return
 
 
