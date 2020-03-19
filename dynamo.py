@@ -589,4 +589,5 @@ def delete_emoji_role(emoji):
             'emoji': emoji
         }
     )
+    scan_for_roles()
     return "deleted"
