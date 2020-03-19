@@ -13,8 +13,10 @@ suggestionBansTableName = 'mg_suggestion_bans'
 phraseTableName = 'mg_phrase'
 giveawaysTableName = 'mg_giveaways'
 giveawayEntriesTableName = 'mg_giveaway_entries'
+rolesTableName = 'mg_roles'
 phrase_cache = {}
 giveaways_cache = {}
+roles_cache = {}
 
 
 def init():
@@ -233,8 +235,33 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=giveawayEntriesTableName)
+    try:
+        dynamodb.describe_table(TableName=rolesTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=rolesTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'emoji',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'emoji',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=rolesTableName)
     scan_for_phrases()
     scan_for_giveaways()
+    scan_for_roles()
 
 
 def add_custom_command(command, value):
@@ -470,6 +497,14 @@ def scan_for_giveaways():
         giveaways_cache[i['giveaway_id']] = i['end_date']
 
 
+def scan_for_roles():
+    table = session.resource('dynamodb').Table(rolesTableName)
+    response = table.scan()
+    roles_cache.clear()
+    for i in response['Items']:
+        roles_cache[i['emoji']] = i['role']
+
+
 def new_giveaway(giveaway_id, end_date, prize):
     table = session.resource('dynamodb').Table(giveawaysTableName)
     table.put_item(Item={
@@ -531,3 +566,27 @@ def get_all_entries(giveaway_id):
 
 def get_giveaway(giveaway_id):
     return giveaways_cache.get(str(giveaway_id), None)
+
+
+def get_role(emoji):
+    return roles_cache.get(emoji, None)
+
+
+def add_role_emoji(emoji, role):
+    table = session.resource('dynamodb').Table(rolesTableName)
+    table.put_item(Item={
+        'emoji': emoji,
+        'role': role
+    })
+    scan_for_roles()
+    return True
+
+
+def delete_emoji_role(emoji):
+    table = session.resource('dynamodb').Table(rolesTableName)
+    table.delete_item(
+        Key={
+            'emoji': emoji
+        }
+    )
+    return "deleted"
