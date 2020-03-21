@@ -6,6 +6,7 @@ import datetime
 from datetime import datetime, timedelta
 from discord.ext import commands
 from .moderation import is_mod
+import typing
 
 welcome_chat_id = 334014732572950528
 fight_hands = {"rock": "\u270A", "paper": "\u270B", "scissor": "\u270C"}
@@ -15,12 +16,29 @@ questions_url = "https://opentdb.com/api.php?amount=1&type=multiple"
 class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.autoreactlist = {}
 
     @commands.command(name="invitelink", help="Prints a single use invite that expires after 24hrs")
     async def invite_link(self, ctx):
         invite = await ctx.guild.get_channel(welcome_chat_id).create_invite(max_uses=1, max_age=1440,
                                                                             reason="created by " + str(ctx.author))
         await ctx.channel.send("New invite created for " + ctx.author.mention + " " + invite.url)
+
+    @commands.command(name="autoreact", help="Auto-react to every message a user sends with specified emojis")
+    async def auto_react(self, ctx, member, *emojis: typing.Union[discord.Emoji, str]):
+        result_emojis = []
+        for emoji in emojis:
+            result_emojis.append(emoji)
+        self.autoreactlist[member] = result_emojis
+        await ctx.channel.send("Auto reaction added!")
+
+    @commands.command(name="deleteautoreact", help="Delete auto-reacts")
+    async def delete_auto_react(self, ctx, member):
+        if member in self.autoreactlist:
+            del self.autoreactlist[member]
+            await ctx.channel.send("Auto reaction deleted!")
+        else:
+            await ctx.channel.send("User didn't have an auto reaction.")
 
     @is_mod()
     @commands.command(help="creates/updates a custom command")
@@ -132,6 +150,7 @@ class Misc(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        await self.check_auto_react(message)
         if message.content.startswith('$'):
             response = dynamo.get_custom_command(message.content[1:])
             if response is not None:
@@ -151,7 +170,6 @@ class Misc(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        # handle giveaways
         if dynamo.get_giveaway(payload.message_id) is not None and payload.emoji.name == "🏆":
             dynamo.delete_giveaway_entry(payload.user_id, payload.message_id)
             await self.bot.get_guild(payload.guild_id).get_member(payload.user_id).send(
@@ -160,6 +178,11 @@ class Misc(commands.Cog):
     def decoder(self, content):
         new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&amp;", "&")
         return new
+
+    async def check_auto_react(self, message):
+        if str(message.author.id) in self.autoreactlist:
+            for emoji in self.autoreactlist[str(message.author.id)]:
+                await message.add_reaction(emoji)
 
 
 def setup(bot):
