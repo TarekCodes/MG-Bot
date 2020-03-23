@@ -21,6 +21,7 @@ class AutoRoles(commands.Cog):
         embed.add_field(name="Emoji", value=emoji)
         embed.add_field(name="Role", value=role)
         await ctx.channel.send(embed=embed)
+        await self.setup_emojis()
 
     @is_mod()
     @commands.command(name="deleteroleemoji", help="deletes a role-emoji association")
@@ -30,6 +31,7 @@ class AutoRoles(commands.Cog):
         embed.set_author(name="Deleted emoji-role association", icon_url=ctx.guild.icon_url)
         embed.add_field(name="Emoji", value=emoji)
         await ctx.channel.send(embed=embed)
+        await self.setup_emojis()
 
     @is_mod()
     @commands.command(name="getallrolesemojis", help="gets all role-emoji associations")
