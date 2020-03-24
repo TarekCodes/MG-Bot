@@ -87,8 +87,8 @@ class Misc(commands.Cog):
             decoded_choices.append(self.decoder(choice))
         decoded_choices.append(answer)
         random.shuffle(decoded_choices)
-        answer_num = decoded_choices.index(answer)
-        question_id = dynamo.new_question(question, answer, choices, answer_num)
+        answer_num = decoded_choices.index(answer) + 1
+        question_id = dynamo.new_question(question, choices, answer_num)
         embed = discord.Embed(color=discord.Color.purple(), description="**" + question + "**")
         embed.set_author(name="Question #{}".format(question_id), icon_url=ctx.guild.icon_url)
         count = 1

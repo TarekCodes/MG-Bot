@@ -348,13 +348,12 @@ def get_all_custom():
     return result
 
 
-def new_question(question, answer, choices, answer_num):
+def new_question(question, choices, answer_num):
     table = session.resource('dynamodb').Table(questionsTableName)
     question_id = datetime.now().microsecond
     table.put_item(Item={
         'id': question_id,
         'question': question,
-        'answer': answer,
         'choices': choices,
         'answer_num': answer_num
     })
