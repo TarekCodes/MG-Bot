@@ -81,28 +81,40 @@ class Misc(commands.Cog):
         response = requests.get(questions_url).json()
         question = self.decoder(response["results"][0]["question"])
         answer = self.decoder(response["results"][0]["correct_answer"])
-        question_id = dynamo.new_question(question, answer)
-        await ctx.channel.send("Question #" + str(question_id) + ": " + question)
+        choices = response["results"][0]["incorrect_answers"]
+        decoded_choices = []
+        for choice in choices:
+            decoded_choices.append(self.decoder(choice))
+        decoded_choices.append(answer)
+        random.shuffle(decoded_choices)
+        answer_num = decoded_choices.index(answer)
+        question_id = dynamo.new_question(question, answer, choices, answer_num)
+        embed = discord.Embed(color=discord.Color.purple(), description="**" + question + "**")
+        embed.set_author(name="Question #{}".format(question_id), icon_url=ctx.guild.icon_url)
+        count = 1
+        for choice in decoded_choices:
+            embed.add_field(name="Choice #{}".format(count),
+                            value=choice, inline=False)
+            count += 1
+        await ctx.channel.send(embed=embed)
 
     @commands.command(name="answer", help="answers a trivia question by providing the question number and answer")
-    async def answer_question(self, ctx, question_id, *value):
-        try:
-            answer = " ".join(value)
-            correct_answer = dynamo.get_answer(int(question_id))
-            if correct_answer is None:
-                await ctx.channel.send("Question not found.")
-                return
-            if correct_answer.strip().lower() == answer.strip().lower():
-                dynamo.delete_question(int(question_id))
-                score = dynamo.increment_score(ctx.author.id, ctx.guild.id)
-                await ctx.message.add_reaction("🌟")
-                await ctx.channel.send("Correct answer!!! Your score is now " + str(score))
-            else:
-                await ctx.message.add_reaction("❌")
-                await ctx.channel.send("Wrong answer. Loser.")
-        except Exception as e:
-            print(e)
-            await ctx.channel.send("Invalid command.")
+    async def answer_question(self, ctx, question_id: int, answer: int):
+        correct_answer = dynamo.get_answer(question_id)
+        if correct_answer is None:
+            await ctx.channel.send("Question not found.")
+            return
+        if answer == correct_answer:
+            dynamo.delete_question(question_id)
+            score = dynamo.increment_score(ctx.author.id, ctx.guild.id)
+            await ctx.message.add_reaction("🌟")
+            embed = discord.Embed(color=discord.Color.green(), description="Correct Answer!")
+            embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+            embed.add_field(name="New Score", value=score)
+            await ctx.channel.send(embed=embed)
+        else:
+            await ctx.message.add_reaction("❌")
+            await ctx.channel.send("Wrong answer. Loser.")
 
     @commands.command(name="score", help="gets your current trivia score")
     async def get_score(self, ctx):
@@ -176,7 +188,8 @@ class Misc(commands.Cog):
                 "Your entry has been removed.")
 
     def decoder(self, content):
-        new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&amp;", "&")
+        new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&amp;", "&") \
+            .replace("&auml;", "ä")
         return new
 
     async def check_auto_react(self, message):
