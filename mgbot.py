@@ -5,7 +5,7 @@ from discord.ext import commands
 TOKEN = config.botToken
 
 initial_extensions = ['cogs.moderation', 'cogs.misc', 'cogs.suggestions', 'cogs.eventlogging', 'cogs.reddit',
-                      'cogs.autoroles']
+                      'cogs.autoroles', 'cogs.trello']
 
 bot = commands.Bot(command_prefix='$', case_insensitive=False, description="MG Bot")
 for extension in initial_extensions:

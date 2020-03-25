@@ -87,6 +87,9 @@ class Suggestions(commands.Cog):
         msg = await self.bot.get_channel(suggestions_chat_id).send(
             "New Suggestion: " + message.content[message.content.find(' '):])
         dynamo.add_new_suggestion(message, date, msg.id)
+        await msg.add_reaction("📆")
+        await msg.add_reaction("💻")
+        await msg.add_reaction("🏢")
         await message.author.send("Thanks for your suggestion!")
         return
 

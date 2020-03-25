@@ -15,6 +15,8 @@ muted_channels_overwrites = {}
 allowed_roles = [team_leads_role, president_role, events_lead_role, mods_role, admin_role, infra_lead_role,
                  infra_team_role, socialmedia_lead_role, bots_role_id]
 
+lead_roles = {team_leads_role, president_role, events_lead_role, admin_role, infra_lead_role}
+
 
 def is_mod():
     async def predicate(ctx):
