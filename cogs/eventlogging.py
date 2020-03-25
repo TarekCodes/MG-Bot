@@ -175,10 +175,12 @@ class EventLogging(commands.Cog):
         embed.set_thumbnail(url=member.avatar_url)
         await self.bot.get_channel(bot_log).send(embed=embed)
 
-    def filter_perms(self, perm):
+    @staticmethod
+    def filter_perms(perm):
         return perm[1]
 
-    def get_perms(self, perms):
+    @staticmethod
+    def get_perms(perms):
         perms_list = ""
         for perm in perms:
             if perms_list != "":

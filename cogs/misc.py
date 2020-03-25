@@ -187,7 +187,8 @@ class Misc(commands.Cog):
             await self.bot.get_guild(payload.guild_id).get_member(payload.user_id).send(
                 "Your entry has been removed.")
 
-    def decoder(self, content):
+    @staticmethod
+    def decoder(content):
         new = content.replace("&quot;", "\"").replace("&#039;", "'").replace("&‌pi;", "π").replace("&amp;", "&") \
             .replace("&auml;", "ä")
         return new

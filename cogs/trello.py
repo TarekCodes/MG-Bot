@@ -42,7 +42,8 @@ class Trello(commands.Cog):
             cards_list = social_suggestions_box_id
         self.create_card(cards_list, suggestion_content, author.name)
 
-    def create_card(self, list_id, suggestion, author):
+    @staticmethod
+    def create_card(list_id, suggestion, author):
         params = {'key': config.trello_key, 'token': config.trello_token, 'idList': list_id,
                   'name': "Suggestion: " + author, 'desc': suggestion}
         requests.post(url=trello_cards_api_prefix, params=params)

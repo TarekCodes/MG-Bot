@@ -46,7 +46,8 @@ class Reddit(commands.Cog):
         # else:
         #     await message.channel.send("```" + post.selftext + "\n\n" + post.shortlink + "```")
 
-    def init_reddit(self):
+    @staticmethod
+    def init_reddit():
         reddit = praw.Reddit(client_id=config.clientID, client_secret=config.redditSecret, user_agent='discord bot')
         reddit.read_only = True
         return reddit

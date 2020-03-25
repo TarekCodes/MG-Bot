@@ -153,7 +153,8 @@ class Moderation(commands.Cog):
     def is_coned(self, member_id):
         return member_id in self.coned
 
-    async def cone_message(self, message):
+    @staticmethod
+    async def cone_message(message):
         await message.add_reaction("\U0001F4A9")
         await message.add_reaction("\U0001F1F8")
         await message.add_reaction("\U0001F1ED")
