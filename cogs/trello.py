@@ -1,6 +1,5 @@
 from discord.ext import commands
 import dynamo
-from .suggestions import suggestions_chat_id
 from .moderation import lead_roles
 import requests
 import config
@@ -14,6 +13,7 @@ events_suggestions_box_id = "5e611343fd690986ab1187d8"
 mods_suggestions_box_id = "5e611428b8c23a2592e3e08e"
 social_suggestions_box_id = "5e6114cb147ff1129f01c219"
 trello_cards_api_prefix = "https://api.trello.com/1/cards"
+suggestions_chat_id = 480459932164947969
 
 
 class Trello(commands.Cog):
