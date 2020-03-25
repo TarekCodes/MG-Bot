@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from discord.ext import commands
 from dateutil import parser
 from .moderation import is_mod
+from .trello import Trello
 
 botlog_chat_id = 245252349587619840
 suggestions_chat_id = 480459932164947969
@@ -86,10 +87,7 @@ class Suggestions(commands.Cog):
         msg = await self.bot.get_channel(suggestions_chat_id).send(
             "New Suggestion: " + message.content[message.content.find(' '):])
         dynamo.add_new_suggestion(message, date, msg.id)
-        await msg.add_reaction("📆")
-        await msg.add_reaction("💻")
-        await msg.add_reaction("🏢")
-        await msg.add_reaction("🦸‍♀️")
+        await Trello.setup_reactions(msg)
         await message.author.send("Thanks for your suggestion!")
 
 

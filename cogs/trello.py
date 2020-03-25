@@ -47,6 +47,13 @@ class Trello(commands.Cog):
                   'name': "Suggestion: " + author, 'desc': suggestion}
         requests.post(url=trello_cards_api_prefix, params=params)
 
+    @staticmethod
+    async def setup_reactions(msg):
+        await msg.add_reaction("📆")
+        await msg.add_reaction("💻")
+        await msg.add_reaction("🏢")
+        await msg.add_reaction("🦸‍♀️")
+
 
 def setup(bot):
     bot.add_cog(Trello(bot))
