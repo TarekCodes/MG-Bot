@@ -10,7 +10,7 @@ from .trello import Trello
 botlog_chat_id = 245252349587619840
 suggestions_chat_id = 480459932164947969
 default_suggestion_wait = 1
-
+mg_guild_id = 192321256073199616
 
 class Suggestions(commands.Cog):
     def __init__(self, bot):
@@ -84,8 +84,11 @@ class Suggestions(commands.Cog):
                     "Too soon! You need to wait " + str(
                         default_suggestion_wait * 60 - int(date_delta.seconds / 60)) + " minutes.")
                 return
-        msg = await self.bot.get_channel(suggestions_chat_id).send(
-            "New Suggestion: " + message.content[message.content.find(' '):])
+        embed = discord.Embed(
+            description=message.content[message.content.find(' '):],
+            timestamp=datetime.utcnow(), color=discord.Color.light_grey())
+        embed.set_author(name="New Suggestion", icon_url=self.bot.get_guild(mg_guild_id).icon_url)
+        msg = await self.bot.get_channel(suggestions_chat_id).send(embed=embed)
         dynamo.add_new_suggestion(message, date, msg.id)
         await Trello.setup_reactions(msg)
         await message.author.send("Thanks for your suggestion!")

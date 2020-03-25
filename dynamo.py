@@ -444,7 +444,6 @@ def is_suggestion_banned(user_id):
         found = response['Item']['user_id']
         return found
     except Exception as e:
-        print(e)
         return None
 
 
