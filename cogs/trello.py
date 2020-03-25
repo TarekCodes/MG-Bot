@@ -7,10 +7,12 @@ import config
 
 events_board_id = "5e611343fd690986ab1187d4"
 infra_board_id = "5e611635ed121b4fe3051c0a"
-mod_board_id = ""
+mod_board_id = "5e611428b8c23a2592e3e08a"
+social_board_id = "5e6114cb147ff1129f01c217"
 infra_suggestion_box_id = "5e602bcbc092ff4343ef6c1f"
 events_suggestions_box_id = "5e611343fd690986ab1187d8"
-mods_suggestions_box_id = ""
+mods_suggestions_box_id = "5e611428b8c23a2592e3e08e"
+social_suggestions_box_id = "5e6114cb147ff1129f01c219"
 trello_cards_api_prefix = "https://api.trello.com/1/cards"
 
 
@@ -36,6 +38,8 @@ class Trello(commands.Cog):
             cards_list = infra_suggestion_box_id
         if emoji.name == "🏢":
             cards_list = mods_suggestions_box_id
+        if emoji.name == "🦸‍♀️":
+            cards_list = social_suggestions_box_id
         self.create_card(cards_list, suggestion_content, author.name)
 
     def create_card(self, list_id, suggestion, author):

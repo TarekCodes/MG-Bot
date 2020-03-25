@@ -68,7 +68,6 @@ class Suggestions(commands.Cog):
     async def on_message(self, message):
         if message.guild is None and message.content.lower().startswith('suggestion: '):
             await self.new_suggestion(message)
-            return
 
     async def new_suggestion(self, message):
         date = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
@@ -90,8 +89,8 @@ class Suggestions(commands.Cog):
         await msg.add_reaction("📆")
         await msg.add_reaction("💻")
         await msg.add_reaction("🏢")
+        await msg.add_reaction("🦸‍♀️")
         await message.author.send("Thanks for your suggestion!")
-        return
 
 
 def setup(bot):
