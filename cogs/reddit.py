@@ -4,6 +4,8 @@ import config
 import requests
 from .moderation import is_mod
 
+reddit_url = "https://reddit.com"
+
 
 class Reddit(commands.Cog):
     def __init__(self, bot):
@@ -25,7 +27,7 @@ class Reddit(commands.Cog):
             print(e)
             await ctx.channel.send("Invalid Command")
             return
-        post_link = config.reddit_url + post.permalink
+        post_link = reddit_url + post.permalink
         if len(post.selftext) > 5:
             await ctx.channel.send(post_link)
             return
