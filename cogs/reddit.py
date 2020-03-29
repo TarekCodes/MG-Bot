@@ -13,7 +13,6 @@ class Reddit(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @is_mod()
     @commands.command(name="reddit", help="gets top post or whatever number if period is specified")
     async def get_top_post(self, ctx, subreddit, *args):
         reddit = self.init_reddit()
