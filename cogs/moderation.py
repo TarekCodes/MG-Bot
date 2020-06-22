@@ -117,7 +117,7 @@ class Moderation(commands.Cog):
     async def clear(self, ctx, num: int, *members: commands.Greedy[discord.Member]):
         check = (lambda m: m.author in members) if members else None
         deleted = await ctx.channel.purge(limit=num + 1, check=check)
-        await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)))
+        await ctx.channel.send('Deleted {} message(s)'.format(len(deleted)), delete_after=5)
 
     @is_mod()
     @commands.command(name="mutechannel", help="mutes everyone except for mods")
