@@ -1,4 +1,5 @@
 from discord.ext import commands
+from textwrap import dedent
 import discord
 import datetime
 
@@ -9,6 +10,7 @@ roles_chat_id = 365624761398591489
 rules_chat_id = 458786996022673408
 announcements_chat_id = 349679027126272011
 welcome_chat_id = 334014732572950528
+welcome_brigade_id = 736364294249119814
 botspam_channel_id = 463874995169394698
 color_url_prefix = "https://www.color-hex.com/color/"
 
@@ -33,14 +35,15 @@ class EventLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        msg = "Assalamualaikum " + member.mention + "! Welcome to **Muslim Gamers**! Please take a moment to introduce "
-        msg += "yourself! You may only chat here for the time being until you reach lvl 1.\n\n"
-        msg += "**You gain lvls by chatting!** After reaching lvl 1 you will gain access to the rest of the chats.\n\n"
-        msg += "**Checkout the roles we have over at " + self.bot.get_channel(roles_chat_id).mention + " and react "
-        msg += "to the messages to give yourself the ones you like.**\n\n"
-        msg += "Feel free to read " + self.bot.get_channel(rules_chat_id).mention + " and follow them accordingly.\n"
-        msg += "Also check out " + self.bot.get_channel(announcements_chat_id).mention
-        msg += " for the latest things happening in the server.\n"
+        msg = dedent("""
+        Salaams {user}! Welcome to Muslim Gamers!
+
+        Please take some time to introduce yourself here. 
+        You'll unlock the rest of the server once you posted enough here to reach level 1.
+
+        If you have issues with phone verification, please reach out to the mods.
+        If you have any questions or need help talking to level up, our @{welcome_brigade} is here to help you.""")
+        .format(user=member.mention, welcome_brigade=self.bot.get_channel(welcome_brigade_id))
         await self.bot.get_channel(welcome_chat_id).send(msg)
         await self.member_join_log(member)
 
