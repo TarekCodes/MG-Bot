@@ -42,8 +42,8 @@ class EventLogging(commands.Cog):
         You'll unlock the rest of the server once you posted enough here to reach level 1.
 
         If you have issues with phone verification, please reach out to the mods.
-        If you have any questions or need help talking to level up, our {welcome_brigade} is here to help you.""")
-        .format(user=member.mention, welcome_brigade=self.bot.get_channel(welcome_brigade_id).mention)
+        If you have any questions or need help talking to level up, our {welcome_brigade} is here to help you.""").format(
+            user=member.mention, welcome_brigade=self.bot.get_channel(welcome_brigade_id).mention)
         await self.bot.get_channel(welcome_chat_id).send(msg)
         await self.member_join_log(member)
 
