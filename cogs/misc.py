@@ -11,6 +11,7 @@ import typing
 welcome_chat_id = 334014732572950528
 fight_hands = {"rock": "\u270A", "paper": "\u270B", "scissor": "\u270C"}
 questions_url = "https://opentdb.com/api.php?amount=1&type=multiple"
+eid_present_url = "https://i.imgur.com/H9lriCz.png"
 
 
 class Misc(commands.Cog):
@@ -120,23 +121,36 @@ class Misc(commands.Cog):
         await ctx.channel.send("Your current score is: " + str(dynamo.get_score(ctx.author.id, ctx.guild.id)))
 
     @is_mod()
-    @commands.command(name="startgiveaway", help="starts a new giveaway, default channel is the current one")
-    async def start_giveaway(self, ctx, period, prize, mention_everyone: bool, channel_mention: discord.TextChannel):
+    @commands.command(name="startgiveaway", help="starts a new giveaway")
+    async def start_giveaway(self, ctx, period, prize, mention_everyone: bool, channel: discord.TextChannel):
         mention = ""
         period_unit = period[-1]
+        period_name = "Days"
         if period_unit.lower() == "d":
             end_date = (datetime.now() + timedelta(days=int(period[:-1]))).strftime("%Y-%m-%d %H:%M:%S")
         else:
             if period_unit.lower() == "h":
                 end_date = (datetime.now() + timedelta(hours=int(period[:-1]))).strftime("%Y-%m-%d %H:%M:%S")
+                period_name = "Hours"
             else:
                 raise Exception()
         if mention_everyone:
             mention = " @everyone"
-        announcement_message = await channel_mention.send(
-            "New giveaway! The prize is " + prize + " and it expires " + end_date + ". React to this message with 🏆 to enter!" + mention)
-        await announcement_message.add_reaction("🏆")
-        dynamo.new_giveaway(announcement_message.id, end_date, prize)
+
+        embed = discord.Embed(
+            description="React to this message with 🏆 to enter!",
+            timestamp=datetime.utcnow(), color=discord.Color.gold())
+        embed.set_author(name="NEW GIVEAWAY!", icon_url=ctx.guild.icon_url)
+        embed.add_field(name="Expires",
+                        value="In {} {}".format(period[:-1], period_name))
+        embed.add_field(name="Prize",
+                        value=prize, inline=False)
+        embed.set_thumbnail(url=eid_present_url)
+        msg = await channel.send(mention, embed=embed)
+        embed.set_footer(text="ID: " + str(msg.id))
+        await msg.edit(embed=embed)
+        await msg.add_reaction("🏆")
+        dynamo.new_giveaway(msg.id, end_date, prize)
 
     @is_mod()
     @commands.command(name="endgiveaway", help="returns a winner and ends the giveaway early if necessary")
