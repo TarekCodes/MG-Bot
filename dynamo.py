@@ -549,7 +549,7 @@ def end_giveaway(giveaway_id):
     entries = get_all_entries(giveaway_id)
     if len(entries) == 0:
         return None
-    winner = random.randint(0, len(entries))
+    winner = random.randint(0, len(entries)-1)
     return entries[winner]
 
 
