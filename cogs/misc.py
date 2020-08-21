@@ -176,14 +176,17 @@ class Misc(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         await self.check_auto_react(message)
+        if message.author.id == self.bot.user.id:
+            return
         if message.content.startswith('$'):
             response = dynamo.get_custom_command(message.content[1:])
             if response is not None:
                 await message.channel.send(response)
-        val = dynamo.get_phrase(message.content)
-        if val is not None and message.author.id != self.bot.user.id:
-            await message.channel.send(val)
-            return
+        else:
+            val = dynamo.get_phrase(message.content)
+            if val is not None:
+                await message.channel.send(val)
+                return
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
