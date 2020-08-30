@@ -49,8 +49,8 @@ class EventLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
-        await self.bot.get_channel(botspam_channel_id).send(msg)
+        # msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
+        # await self.bot.get_channel(botspam_channel_id).send(msg)
         await self.member_leave_log(member)
 
     @commands.Cog.listener()
