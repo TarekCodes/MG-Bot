@@ -10,7 +10,6 @@ roles_chat_id = 365624761398591489
 rules_chat_id = 458786996022673408
 announcements_chat_id = 349679027126272011
 welcome_chat_id = 334014732572950528
-welcome_brigade_id = 573872767670419456
 botspam_channel_id = 463874995169394698
 color_url_prefix = "https://www.color-hex.com/color/"
 
@@ -41,9 +40,8 @@ class EventLogging(commands.Cog):
         Please take some time to introduce yourself here. 
         **You'll unlock the rest of the server once you posted enough here to reach level 1.**
 
-        **If you have issues with phone verification, please reach out to the mods.**
-        If you have any questions or need help talking to level up, our {welcome_brigade} is here to help you.""").format(
-            user=member.mention, welcome_brigade=member.guild.get_role(welcome_brigade_id).mention)
+        **If you have issues with phone verification, please reach out to the Community Mods.**""").format(
+            user=member.mention)
         await self.bot.get_channel(welcome_chat_id).send(msg)
         await self.member_join_log(member)
 
