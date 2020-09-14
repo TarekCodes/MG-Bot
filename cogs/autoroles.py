@@ -45,8 +45,7 @@ class AutoRoles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if len(roles_msgs) == 0:
-            await self.setup_emojis()
+        await self.setup_emojis()
         if payload.message_id in roles_msgs:
             role_name = dynamo.get_role(str(payload.emoji))
             if role_name is not None:
@@ -57,8 +56,7 @@ class AutoRoles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        if len(roles_msgs) == 0:
-            await self.setup_emojis()
+        await self.setup_emojis()
         if payload.message_id in roles_msgs:
             role_name = dynamo.get_role(str(payload.emoji))
             if role_name is not None:
