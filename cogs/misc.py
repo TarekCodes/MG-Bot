@@ -162,6 +162,7 @@ class Misc(commands.Cog):
         if winner is None:
             await ctx.channel.send("No one won. Booooooooo!")
             return
+        await ctx.guild.query_members(user_ids=[int(winner)], cache=True)
         await ctx.channel.send("The winner is..." + ctx.guild.get_member(int(winner)).mention + "!!!!! Congrats!")
 
     @is_mod()
@@ -205,6 +206,7 @@ class Misc(commands.Cog):
     async def on_raw_reaction_remove(self, payload):
         if dynamo.get_giveaway(payload.message_id) is not None and payload.emoji.name == "🏆":
             dynamo.delete_giveaway_entry(payload.user_id, payload.message_id)
+            await self.bot.get_guild(payload.guild_id).query_members(user_ids=[payload.user_id], cache=True)
             await self.bot.get_guild(payload.guild_id).get_member(payload.user_id).send(
                 "Your entry has been removed.")
 

@@ -50,6 +50,7 @@ class AutoRoles(commands.Cog):
             role_name = dynamo.get_role(str(payload.emoji))
             if role_name is not None:
                 guild = self.bot.get_guild(payload.guild_id)
+                await guild.query_members(user_ids=[payload.user_id], cache=True)
                 user = guild.get_member(payload.user_id)
                 role = discord.utils.get(guild.roles, name=role_name)
                 await user.add_roles(role, atomic=True)
@@ -61,6 +62,7 @@ class AutoRoles(commands.Cog):
             role_name = dynamo.get_role(str(payload.emoji))
             if role_name is not None:
                 guild = self.bot.get_guild(payload.guild_id)
+                await guild.query_members(user_ids=[payload.user_id], cache=True)
                 user = guild.get_member(payload.user_id)
                 role = discord.utils.get(guild.roles, name=role_name)
                 try:

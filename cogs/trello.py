@@ -29,6 +29,7 @@ class Trello(commands.Cog):
             return
         suggestion = suggestion_list[0]
         suggestion_content = suggestion['suggestions'].strip()
+        await self.bot.get_guild(payload.guild_id).query_members(user_ids=[payload.user_id], cache=True)
         author = self.bot.get_guild(payload.guild_id).get_member(int(suggestion['user_id']))
         emoji = payload.emoji
         cards_list = None

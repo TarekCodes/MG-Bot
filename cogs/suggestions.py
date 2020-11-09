@@ -36,6 +36,7 @@ class Suggestions(commands.Cog):
             await ctx.guild.get_channel(botlog_chat_id).send("Suggestion not found")
             return
         suggestion = suggestion_list[0]
+        await ctx.guild.query_members(user_ids=[int(suggestion['user_id'])], cache=True)
         member = ctx.guild.get_member(int(suggestion['user_id']))
         embed = discord.Embed(
             description=suggestion['suggestions'].strip(),
@@ -51,6 +52,7 @@ class Suggestions(commands.Cog):
         msgs = []
         try:
             suggestions = dynamo.get_all_suggestion(user_id)
+            await ctx.guild.query_members(user_ids=[int(user_id)], cache=True)
             current = "```User: " + ctx.guild.get_member(int(user_id)).name + "```\n\n"
             for item in suggestions:
                 addition = "```Date: " + item['date'] + "\n" + item['suggestions'].strip() + "```\n\n"
