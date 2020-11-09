@@ -173,6 +173,11 @@ class Misc(commands.Cog):
         else:
             await ctx.channel.send("Mission Accomplished")
 
+    @commands.command(name="rng", help="Returns a random number within a range")
+    async def rng(self, ctx, start: int, end: int):
+        num = random.randint(start, end)
+        await ctx.channel.send(num)
+
     @commands.Cog.listener()
     async def on_message(self, message):
         await self.check_auto_react(message)
