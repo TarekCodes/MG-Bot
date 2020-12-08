@@ -1,7 +1,7 @@
 import discord
 import dynamo
 import datetime
-from datetime import datetime, timedelta
+from datetime import datetime
 from discord.ext import commands
 from dateutil import parser
 from .moderation import is_mod
@@ -11,6 +11,7 @@ botlog_chat_id = 245252349587619840
 suggestions_chat_id = 480459932164947969
 default_suggestion_wait = 1
 mg_guild_id = 192321256073199616
+
 
 class Suggestions(commands.Cog):
     def __init__(self, bot):

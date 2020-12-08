@@ -14,6 +14,8 @@ phraseTableName = 'mg_phrase'
 giveawaysTableName = 'mg_giveaways'
 giveawayEntriesTableName = 'mg_giveaway_entries'
 rolesTableName = 'mg_roles'
+anonQuestionsTableName = 'mg_anon_questions'
+anonQuestionBansTableName = 'mg_anon_questions_bans'
 phrase_cache = {}
 giveaways_cache = {}
 roles_cache = {}
@@ -69,6 +71,31 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=suggestionBansTableName)
+
+    try:
+        dynamodb.describe_table(TableName=anonQuestionBansTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=anonQuestionBansTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'user_id',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'user_id',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=anonQuestionBansTableName)
 
     try:
         dynamodb.describe_table(TableName=suggestionsTableName)
@@ -127,6 +154,39 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=questionsTableName)
+
+    try:
+        dynamodb.describe_table(TableName=anonQuestionsTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=anonQuestionsTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'user_id',
+                    'KeyType': 'HASH'
+                },
+                {
+                    'AttributeName': 'date',
+                    'KeyType': 'RANGE'  # Sort key
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'user_id',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'date',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=anonQuestionsTableName)
 
     try:
         dynamodb.describe_table(TableName=scoresTableName)
@@ -333,6 +393,44 @@ def get_suggestion(msg_id):
     return suggestion['Items']
 
 
+def add_anon_question(message, date, msg_id):
+    table = session.resource('dynamodb').Table(anonQuestionsTableName)
+    table.put_item(Item={
+        'user_id': str(message.author.id),
+        'date': str(date),
+        'msg_id': str(msg_id),
+        'questions': message.content[message.content.find(' '):]
+    })
+    return "done"
+
+
+def get_latest_anon_question(message):
+    table = session.resource('dynamodb').Table(anonQuestionsTableName)
+    last_question = table.query(
+        KeyConditionExpression=Key('user_id').eq(str(message.author.id))
+    )
+    if len(last_question['Items']) == 0:
+        return None
+    return last_question['Items'][len(last_question['Items']) - 1]
+
+
+def get_all_anon_questions(user_id):
+    table = session.resource('dynamodb').Table(anonQuestionsTableName)
+    questions = table.query(
+        KeyConditionExpression=Key('user_id').eq(user_id)
+    )
+    return questions['Items']
+
+
+def get_anon_question(msg_id):
+    table = session.resource('dynamodb').Table(anonQuestionsTableName)
+    question = table.query(
+        IndexName='msg_id_index',
+        KeyConditionExpression=Key('msg_id').eq(msg_id)
+    )
+    return question['Items']
+
+
 def get_all_custom():
     result = []
     current = ""
@@ -457,6 +555,38 @@ def suggestion_unban(user_id):
     return "deleted"
 
 
+def anon_questions_ban(user_id):
+    table = session.resource('dynamodb').Table(anonQuestionBansTableName)
+    table.put_item(Item={
+        'user_id': str(user_id),
+    })
+    return "done"
+
+
+def is_anon_questions_banned(user_id):
+    try:
+        table = session.resource('dynamodb').Table(anonQuestionBansTableName)
+        response = table.get_item(
+            Key={
+                'user_id': str(user_id)
+            }
+        )
+        found = response['Item']['user_id']
+        return found
+    except Exception as e:
+        return None
+
+
+def anon_questions_unban(user_id):
+    table = session.resource('dynamodb').Table(anonQuestionBansTableName)
+    table.delete_item(
+        Key={
+            'user_id': user_id,
+        }
+    )
+    return "deleted"
+
+
 def add_phrase(phrase, value):
     table = session.resource('dynamodb').Table(phraseTableName)
     if value == "":
@@ -549,7 +679,7 @@ def end_giveaway(giveaway_id):
     entries = get_all_entries(giveaway_id)
     if len(entries) == 0:
         return None
-    winner = random.randint(0, len(entries)-1)
+    winner = random.randint(0, len(entries) - 1)
     return entries[winner]
 
 

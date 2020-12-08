@@ -76,7 +76,7 @@ class Misc(commands.Cog):
                         value=ctx.author.mention + " played **" + hand + "** " + emoji, inline=False)
         await ctx.channel.send(embed=embed)
 
-    @commands.command(name="question", help="sends a random trivia questions in the chat")
+    @commands.command(name="trivia", help="sends a random trivia questions in the chat")
     async def get_question(self, ctx):
         response = requests.get(questions_url).json()
         question = self.decoder(response["results"][0]["question"])
