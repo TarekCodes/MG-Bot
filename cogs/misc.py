@@ -122,7 +122,8 @@ class Misc(commands.Cog):
 
     @is_mod()
     @commands.command(name="startgiveaway", help="starts a new giveaway")
-    async def start_giveaway(self, ctx, period, prize, mention_everyone: bool, channel: discord.TextChannel):
+    async def start_giveaway(self, ctx, period, mention_everyone: bool, channel: discord.TextChannel, *prize):
+        prize = ' '.join(prize)
         mention = ""
         period_unit = period[-1]
         period_name = "Days"
