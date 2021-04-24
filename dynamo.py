@@ -23,33 +23,6 @@ roles_cache = {}
 
 welcomeMessageCache : ExpiringDict = ExpiringDict(max_len=25, max_age_seconds=60*15)
 
-def addWelcomeMessage(user_id : int, message_id : int):
-    """Add a user's welcome message when they join
-
-    Parameters
-    ----------
-    user_id : int
-        The user's ID
-    message_id : int
-        The ID of the welcome message
-    """
-    welcomeMessageCache[user_id] = message_id
-
-def getWelcomeMessageID(user_id : int):
-    """Get the ID of the welcome message for the user specified
-
-    Parameters
-    ----------
-    user_id : int
-        The user's ID
-
-    Returns
-    -------
-    int
-        The ID of the message that welcomed this user
-    """
-    return welcomeMessageCache.get(user_id, None)
-
 def init():
     try:
         dynamodb.describe_table(TableName=customTableName)
@@ -750,3 +723,30 @@ def delete_emoji_role(emoji):
     )
     scan_for_roles()
     return "deleted"
+
+def addWelcomeMessage(user_id : int, message_id : int):
+    """Add a user's welcome message when they join
+
+    Parameters
+    ----------
+    user_id : int
+        The user's ID
+    message_id : int
+        The ID of the welcome message
+    """
+    welcomeMessageCache[user_id] = message_id
+
+def getWelcomeMessageID(user_id : int):
+    """Get the ID of the welcome message for the user specified
+
+    Parameters
+    ----------
+    user_id : int
+        The user's ID
+
+    Returns
+    -------
+    int
+        The ID of the message that welcomed this user
+    """
+    return welcomeMessageCache.get(user_id, None)

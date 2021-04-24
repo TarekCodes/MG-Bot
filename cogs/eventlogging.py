@@ -35,7 +35,7 @@ class EventLogging(commands.Cog):
         await self.check_role_change(before, after)
         await self.check_nickname_change(before, after)
 
-     @commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_member_join(self, member : discord.Member):
         msg = dedent("""
         Salaams {user}! Welcome to **Muslim Gamers**!
