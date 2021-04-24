@@ -1,7 +1,10 @@
+from dynamo import addWelcomeMessage, getWelcomeMessageID
 from discord.ext import commands
 from textwrap import dedent
 import discord
 import datetime
+
+from discord.message import Message
 
 voice_role_id = 684253062143016971
 afk_channel_id = 513411791116828692
@@ -32,8 +35,8 @@ class EventLogging(commands.Cog):
         await self.check_role_change(before, after)
         await self.check_nickname_change(before, after)
 
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
+     @commands.Cog.listener()
+    async def on_member_join(self, member : discord.Member):
         msg = dedent("""
         Salaams {user}! Welcome to **Muslim Gamers**!
 
@@ -42,14 +45,24 @@ class EventLogging(commands.Cog):
 
         **If you have issues with phone verification, please reach out to the Community Mods.**""").format(
             user=member.mention)
-        await self.bot.get_channel(welcome_chat_id).send(msg)
+        # Send the welcome message and save it in the cache
+        message : Message = await self.bot.get_channel(welcome_chat_id).send(msg)
+        addWelcomeMessage(member.id, message.id)
+
         await self.member_join_log(member)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         # msg = member.name + " just left **Muslim Gamers**. Bye bye " + member.mention + "..."
         # await self.bot.get_channel(botspam_channel_id).send(msg)
-        await self.member_leave_log(member)
+        
+        # If the user has recently joined the server,
+        #  react to their welcome message with an F
+        message_id : int = getWelcomeMessageID(member.id)
+        if (message_id != None):
+            channel = self.bot.get_channel(bot_log)
+            message : Message = await channel.fetch_message(message_id)
+            await message.add_reaction("🇫")
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
