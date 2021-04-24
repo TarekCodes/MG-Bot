@@ -64,6 +64,8 @@ class EventLogging(commands.Cog):
             message : Message = await channel.fetch_message(message_id)
             await message.add_reaction("🇫")
 
+        await self.member_leave_log(member)
+
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
         embed = discord.Embed(
