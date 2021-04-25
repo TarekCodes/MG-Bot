@@ -1,4 +1,4 @@
-from dynamo import addWelcomeMessage, getWelcomeMessageID
+from cache import add_welcome_message, get_welcome_message_id
 from discord.ext import commands
 from textwrap import dedent
 import discord
@@ -47,7 +47,7 @@ class EventLogging(commands.Cog):
             user=member.mention)
         # Send the welcome message and save it in the cache
         message : Message = await self.bot.get_channel(welcome_chat_id).send(msg)
-        addWelcomeMessage(member.id, message.id)
+        add_welcome_message(member.id, message.id)
 
         await self.member_join_log(member)
 
@@ -58,7 +58,7 @@ class EventLogging(commands.Cog):
         
         # If the user has recently joined the server,
         #  react to their welcome message with an F
-        message_id : int = getWelcomeMessageID(member.id)
+        message_id : int = get_welcome_message_id(member.id)
         if (message_id != None):
             channel = self.bot.get_channel(bot_log)
             message : Message = await channel.fetch_message(message_id)
