@@ -20,7 +20,6 @@ phrase_cache = {}
 giveaways_cache = {}
 roles_cache = {}
 
-
 def init():
     try:
         dynamodb.describe_table(TableName=customTableName)
