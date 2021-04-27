@@ -15,6 +15,9 @@ class AutoRoles(commands.Cog):
     @commands.command(name="addroleemoji", help="adds a new role-emoji association")
     async def add_role_emoji(self, ctx, emoji, *role):
         role = " ".join(role)
+        if role == "":
+            await ctx.channel.send("Role can't be empty")
+            return
         dynamo.add_role_emoji(emoji, role)
         embed = discord.Embed(color=discord.Color.green())
         embed.set_author(name="New emoji-role association", icon_url=ctx.guild.icon_url)
