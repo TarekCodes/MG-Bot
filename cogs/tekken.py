@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import json
 import os
+import random
 
 CHARACTER_NAMES = [
     {
@@ -149,6 +150,13 @@ class Tekken(commands.Cog):
             embed = self.error_embed(bot_msg)
             msg = await ctx.channel.send(embed=embed)
 
+    @commands.command(name="tekkenRandom", help="returns a random Tekken character")
+    async def tekkenRandom(self, ctx):
+        chara_name = random.choice(CHARACTER_NAMES).get('name')
+        character = self.get_character(chara_name)
+        embed = self.character_random_embed(character)
+        await ctx.channel.send(embed=embed)
+
     @staticmethod
     def get_character(chara_name):
         filepath = 'data/character_misc.json'
@@ -218,6 +226,16 @@ class Tekken(commands.Cog):
         embed = discord.Embed(title=character['proper_name'] + ' ' + move_type.lower() + ':',
                               colour=0x00EAFF,
                               description=desc_string)
+        return embed
+
+    @staticmethod
+    def character_random_embed(character):
+        proper_name = character['proper_name']
+        character_link = character['online_webpage']
+        embed = discord.Embed(title='Your random character is',
+                              colour=0x00EAFF,
+                              description=f'[{proper_name}]({character_link})')
+        embed.set_thumbnail(url=character['portrait'])
         return embed
 
     @staticmethod
