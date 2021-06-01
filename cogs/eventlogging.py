@@ -57,12 +57,12 @@ class EventLogging(commands.Cog):
         # await self.bot.get_channel(botspam_channel_id).send(msg)
 
         # If the user has recently joined the server,
-        #  react to their welcome message with an F
+        #  delete their welcome message
         message_id: int = get_welcome_message_id(member.id)
         if (message_id != None):
             channel = self.bot.get_channel(welcome_chat_id)
             message: Message = await channel.fetch_message(message_id)
-            await message.add_reaction("🇫")
+            await message.delete()
 
         await self.member_leave_log(member)
 
