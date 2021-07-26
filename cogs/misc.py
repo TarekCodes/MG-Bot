@@ -120,6 +120,36 @@ class Misc(commands.Cog):
     async def get_score(self, ctx):
         await ctx.channel.send("Your current score is: " + str(dynamo.get_score(ctx.author.id, ctx.guild.id)))
 
+    @commands.command(name="tag", help="tag the users in a vc")
+    @commands.cooldown(1, 15, commands.BucketType.user) 
+    async def tag_voice_channel(self, ctx, *channelName):
+        channelName = ' '.join(channelName)
+        channel: discord.VoiceChannel = discord.utils.get(ctx.guild.channels, name=channelName)
+        if channel == None:
+            await ctx.channel.send("Invalid voice channel")
+            return
+        if not channel.members: 
+            await ctx.channel.send("No-one is in that channel")
+            return
+        await ctx.channel.send(Misc.get_voice_channel_tag_message(ctx.message.author, channel.members))
+    
+    @staticmethod
+    def get_voice_channel_tag_message(user, mentions):
+        start = ["Hey {}! ", "Attention {}! ", "{}. ", "Listen up {}! "]
+        end = ["{} has something to say", "{} needs your attention!", "{} needs a minute"]
+        tag = lambda member: f'<@!{member.id}>'
+        mentions: str = ', '.join([tag(member) for member in mentions])
+        return (random.choice(start) + random.choice(end)).format(mentions, tag(user))
+    
+    @tag_voice_channel.error
+    async def tag_error(self, ctx: commands.Context, error):
+        responses = [f"This command is on cooldown. Try again after {round(error.retry_after)} seconds",
+            "You've already tagged a channel recently. You aren't trying to spam are you? :face_with_raised_eyebrow:",
+            f"This command is on cooldown with {round(error.retry_after)} seconds remaining",
+            "You shouldn't tag people too frequently :angry: :angry: :angry: "]
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(random.choice(responses))
+        
     @is_mod()
     @commands.command(name="startgiveaway", help="starts a new giveaway")
     async def start_giveaway(self, ctx, period, mention_everyone: bool, channel: discord.TextChannel, *prize):
