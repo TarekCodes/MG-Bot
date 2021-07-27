@@ -120,6 +120,22 @@ class Misc(commands.Cog):
     async def get_score(self, ctx):
         await ctx.channel.send("Your current score is: " + str(dynamo.get_score(ctx.author.id, ctx.guild.id)))
 
+    @commands.command(name="howrot", help="gets the rot percentage of a user")
+    async def how_rot(self, ctx, member: discord.Member):
+        percentage = random.randint(0, 100)
+        if member.id == 282296769767800835:
+            percentage = 0
+        if member.id == 199958656337313793:
+            percentage = 100
+        description = "{} is **{}%** rot".format(member.name, percentage)
+        if percentage == 0:
+            description = description + " 😳"
+        else:
+            description = description + " 🤢"
+        embed = discord.Embed(description=description)
+        embed.set_author(name="Rotting detector")
+        await ctx.channel.send(embed=embed)
+
     @is_mod()
     @commands.command(name="startgiveaway", help="starts a new giveaway")
     async def start_giveaway(self, ctx, period, mention_everyone: bool, channel: discord.TextChannel, *prize):

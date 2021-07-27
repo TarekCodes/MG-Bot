@@ -3,7 +3,6 @@ import praw
 import config
 import requests
 import discord
-from .moderation import is_mod
 
 reddit_url = "https://reddit.com"
 reddit_icon_url = "https://www.redditstatic.com/desktop2x/img/favicon/favicon-96x96.png"
