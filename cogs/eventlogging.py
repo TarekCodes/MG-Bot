@@ -14,6 +14,7 @@ rules_chat_id = 458786996022673408
 announcements_chat_id = 349679027126272011
 welcome_chat_id = 334014732572950528
 botspam_channel_id = 463874995169394698
+game_night_club_role_id = 701876858009944066
 color_url_prefix = "https://www.color-hex.com/color/"
 
 
@@ -50,6 +51,8 @@ class EventLogging(commands.Cog):
         add_welcome_message(member.id, message.id)
 
         await self.member_join_log(member)
+        role = discord.utils.get(member.guild.roles, id=game_night_club_role_id)
+        await member.add_roles(role, atomic=True)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):

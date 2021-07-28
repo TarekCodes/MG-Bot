@@ -1,7 +1,6 @@
 from discord.ext import commands
 import discord
 import json
-import os
 import random
 
 CHARACTER_NAMES = [
