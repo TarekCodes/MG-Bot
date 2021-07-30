@@ -16,6 +16,7 @@ giveawayEntriesTableName = 'mg_giveaway_entries'
 rolesTableName = 'mg_roles'
 anonQuestionsTableName = 'mg_anon_questions'
 anonQuestionBansTableName = 'mg_anon_questions_bans'
+rotScoreTableName = 'mg_rot_scores'
 phrase_cache = {}
 giveaways_cache = {}
 roles_cache = {}
@@ -295,6 +296,7 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=giveawayEntriesTableName)
+        
     try:
         dynamodb.describe_table(TableName=rolesTableName)
     except Exception:
@@ -319,6 +321,31 @@ def init():
         )
         print("Table not found")
         dynamodb.get_waiter('table_exists').wait(TableName=rolesTableName)
+    
+    try:
+        dynamodb.describe_table(TableName=rotScoreTableName)
+    except Exception:
+        table = dynamodb.create_table(
+            TableName=rotScoreTableName,
+            KeySchema=[
+                {
+                    'AttributeName': 'user_id',
+                    'KeyType': 'HASH'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'user_id',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 1,
+                'WriteCapacityUnits': 1
+            }
+        )
+        print("Table not found")
+        dynamodb.get_waiter('table_exists').wait(TableName=rotScoreTableName)
     scan_for_phrases()
     scan_for_giveaways()
     scan_for_roles()
@@ -721,3 +748,34 @@ def delete_emoji_role(emoji):
     )
     scan_for_roles()
     return "deleted"
+
+
+def edit_rot_score(user_id, change):
+    table = session.resource('dynamodb').Table(rotScoreTableName)
+    user_id = str(user_id)
+    value = get_rot_score(user_id) + change
+    table.put_item(Item={
+        'user_id': user_id,
+        'value': value
+    })
+    return value
+
+
+def get_rot_score(user_id):
+    table = session.resource('dynamodb').Table(rotScoreTableName)
+    user_id = str(user_id)
+    response = table.get_item(
+        Key={
+            'user_id': user_id
+        }
+    )
+    try:
+        value = response['Item']['value']
+        return value
+    except Exception:
+        value = random.randint(20, 50)
+        table.put_item(Item={
+            'user_id': user_id,
+            'value': value
+        })
+        return value
