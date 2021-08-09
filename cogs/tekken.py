@@ -284,7 +284,12 @@ class Tekken(commands.Cog):
             'ddf': 'd,df',
             'cd': 'f,n,d,df',
             'wr': 'f,f,f',
-            'ewgf': 'f,n,d,df+2'
+            'ewgf': 'f,n,d,df+2',
+            'wgf': 'f,n,d,d/f:2',
+            'perfect electric': 'f,n,df+2',
+            'pe': 'f,n,df+2',
+            'electric': 'f,n,d,df+2',
+            'e': 'f,n,d,df+2'
         }
 
         # Don't apply the above replacements for any of the moves with the following notation
