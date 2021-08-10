@@ -3,6 +3,7 @@ import discord
 import json
 import random
 
+# List of character names with their aliases
 CHARACTER_NAMES = [
     {
         "name": "armor_king",
@@ -87,6 +88,10 @@ CHARACTER_NAMES = [
     {
         "name": "xiaoyu",
         "alias": ["ling"]
+    },
+    {
+        "name": "kunimitsu",
+        "alias": ["kuni", "kun"]
     }
 ]
 
@@ -112,12 +117,10 @@ class Tekken(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(help="fetches move types or a specific move")
+    @commands.command(aliases=["t"], help="fetches move types or a specific move")
     async def tekken(self, ctx, chara_name, *move_name):
         move_name = " ".join(move_name)
-        chara_alias = list(filter(lambda x: (chara_name in x['alias']), CHARACTER_NAMES))
-        if chara_alias:
-            chara_name = chara_alias[0]['name']
+        chara_name = Tekken.match_character(chara_name)
         character = self.get_character(chara_name)
 
         if character is not None:
@@ -157,15 +160,48 @@ class Tekken(commands.Cog):
         await ctx.channel.send(embed=embed)
 
     @staticmethod
+    def match_character(chara_name: str) -> str:
+        """Return the name of the character that matches the input string or 
+        the input string if unable to.
+        Will check for the input character's aliases as well as checking 
+        if the input name matches the start of a characters name
+
+        Parameters
+        ----------
+        chara_name : str
+            Character name as input by the user
+
+        Returns
+        -------
+        str
+            Name of the tekken character that matches or the input string
+        """
+        chara_alias = list(filter(lambda x: (chara_name.lower() in x['alias']), CHARACTER_NAMES))
+        if chara_alias:
+            chara_name = chara_alias[0]['name']
+        else:
+            chara_misc_json = Tekken.get_character_misc()
+            matches = list(filter(lambda x: x['name'].startswith(chara_name), chara_misc_json))
+            if len(matches) == 1:
+                chara_name = matches[0]['name']
+        return chara_name
+
+    @staticmethod
     def get_character(chara_name):
-        filepath = 'data/character_misc.json'
-        with open(filepath) as chara_misc_file:
-            contents = chara_misc_file.read()
-        chara_misc_json = json.loads(contents)
+        chara_misc_json = Tekken.get_character_misc()
         chara_details = list(filter(lambda x: (x['name'].lower() == chara_name.lower()), chara_misc_json))
         if not chara_details:
             return None
         return chara_details[0]
+
+    @staticmethod
+    def get_character_misc():
+        """Load in the character misc file
+        """
+        filepath = 'data/character_misc.json'
+        with open(filepath) as chara_misc_file:
+            contents = chara_misc_file.read()
+        return json.loads(contents)
 
     @staticmethod
     def get_by_move_type(character, move_type):
@@ -214,7 +250,8 @@ class Tekken(commands.Cog):
         embed.add_field(name='Block', value=move['Block frame'])
         embed.add_field(name='Hit', value=move['Hit frame'])
         embed.add_field(name='Counter Hit', value=move['Counter hit frame'])
-        embed.add_field(name='Notes', value=move['Notes'])
+        notes = move['Notes']
+        embed.add_field(name='Notes', value="-" if notes == "" else notes)
         return embed
 
     @staticmethod
@@ -247,7 +284,12 @@ class Tekken(commands.Cog):
             'ddf': 'd,df',
             'cd': 'f,n,d,df',
             'wr': 'f,f,f',
-            'ewgf': 'f,n,d,df+2'
+            'ewgf': 'f,n,d,df+2',
+            'wgf': 'f,n,d,d/f:2',
+            'perfect electric': 'f,n,df+2',
+            'pe': 'f,n,df+2',
+            'electric': 'f,n,d,df+2',
+            'e': 'f,n,d,df+2'
         }
 
         # Don't apply the above replacements for any of the moves with the following notation
