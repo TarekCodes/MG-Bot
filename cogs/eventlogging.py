@@ -16,7 +16,7 @@ welcome_chat_id = 334014732572950528
 botspam_channel_id = 463874995169394698
 game_night_club_role_id = 701876858009944066
 color_url_prefix = "https://www.color-hex.com/color/"
-level_one_role_id = 373141121502674946
+active_member_role_id = 822632772497178695
 
 class EventLogging(commands.Cog):
     def __init__(self, bot):
@@ -148,7 +148,7 @@ class EventLogging(commands.Cog):
                 if role not in before.roles and role.id != voice_role_id:
                     embed = discord.Embed(description=after.mention + " **was given the** `" + role.name + "` **role**",
                                           timestamp=datetime.datetime.utcnow(), color=discord.Color.blue())
-                if role.id == level_one_role_id:
+                if role.id == active_member_role_id:
                     game_night_role = discord.utils.get(after.guild.roles, id=game_night_club_role_id)
                     await after.add_roles(game_night_role, atomic=True)
         try:
