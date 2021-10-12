@@ -2,7 +2,6 @@ from discord.ext import commands
 import discord
 from .moderation import is_mod
 import dynamo
-
 roles_msgs = []
 roles_chat_id = 365624761398591489
 
@@ -42,8 +41,15 @@ class AutoRoles(commands.Cog):
         emojis_roles = dynamo.roles_cache
         embed = discord.Embed(color=discord.Color.blue())
         for emoji, role in emojis_roles.items():
+            if emoji is None or emoji == "":
+                emoji = "*NOT FOUND*"
+            if role is None or role == "":
+                role = "*NOT FOUND*"
             embed.set_author(name="All emoji-role associations", icon_url=ctx.guild.icon_url)
             embed.add_field(name=emoji, value=role)
+            if len(embed.fields) >= 25:
+                await ctx.channel.send(embed=embed)
+                embed.clear_fields()
         await ctx.channel.send(embed=embed)
 
     @commands.Cog.listener()
