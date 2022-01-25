@@ -149,6 +149,10 @@ class Moderation(commands.Cog):
     async def on_message(self, message):
         if self.is_coned(message.author.id):
             await self.cone_message(message)
+        content = message.content.lower()
+        if ("can't" in content or "cant" in content) and "why" in content \
+                and " i " in content:
+            await message.channel.send(message.author.mention + " read the welcome message again!")
 
     def is_coned(self, member_id):
         return member_id in self.coned
